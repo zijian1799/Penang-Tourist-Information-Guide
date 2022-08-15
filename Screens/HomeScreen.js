@@ -6,11 +6,16 @@ import {
   TouchableOpacity,
   Image,
   StyleSheet,
+  FlatList,
   ScrollView,
+  Linking,
+  ImageBackground,
 } from 'react-native';
+import {ceil, color} from 'react-native-reanimated';
 import {SafeAreaView} from 'react-native-safe-area-context';
 
 const win = Dimensions.get('window').width;
+let SQLite = require('react-native-sqlite-storage');
 
 export default class HomeScreen extends Component {
   constructor(props) {
@@ -18,9 +23,91 @@ export default class HomeScreen extends Component {
     this.state = {
       places: [],
     };
+    this._query = this._query.bind(this);
+    this._databasePrepare = this._databasePrepare.bind(this);
+    this.db = SQLite.openDatabase(
+      {name: 'touristguidedb2'},
+      this.openCallback,
+      this.errorCallback,
+    );
+  }
+  componentDidMount() {
+    this._databasePrepare();
+    this._query();
+  }
+  _databasePrepare() {
+    // this.db.transaction(tx => {
+    //   console.log('Running drop table');
+    //   tx.executeSql('DROP TABLE IF EXISTS places'),
+    //     [],
+    //     (sqlTxn, res) => {
+    //       console.log('drop successfully');
+    //     },
+    //     error => {
+    //       console.log('error on dropping table' + error.message);
+    //     };
+    // });
+    this.db.transaction(tx => {
+      tx.executeSql(
+        // 'DROP TABLE IF EXISTS places',
+        'CREATE TABLE IF NOT EXISTS places(id INTEGER PRIMARY KEY AUTOINCREMENT, name text NOT NULL, description text NOT NULL, category text NOT NULL, image text NOT NULL, location text NOT NULL, is_favourite INTEGER, operating_hours VARCHAR(30), priceRange INTEGER, website text, contact text)',
+        [],
+        (sqlTxn, res) => {
+          console.log('places table ready');
+        },
+        error => {
+          console.log('error on creating table ' + error.message);
+        },
+      );
+      this.db.transaction(tx =>
+        tx.executeSql(
+          // 'DELETE FROM places',
+
+          'SELECT * FROM places ORDER BY name',
+          [],
+          (tx, results) => {
+            console.log('table length: ' + results.rows.length);
+
+            if (results.rows.length == 0) {
+              tx.executeSql(
+                'INSERT INTO places(name,description,category,image,location,is_favourite,operating_hours,priceRange,website,contact) VALUES("The Habitat Penang","Educational & fun attraction showing off the areas pristine rainforest while teaching about it ","attraction","https://firebasestorage.googleapis.com/v0/b/wad-assignment-cf7c0.appspot.com/o/thumbnails%2FhabitatPenangHill.png?alt=media&token=d93b3cd8-a257-4f53-ad46-9c03e1129ec3","Jalan Stesen, Bukit Bendera Air Itam, 11500 George Town, Pulau Pinang.",0,"Allday 9am – 7pm",2,"https://thehabitat.my/","019-6457741")',
+                [], //insert dummy data so that the database is non-empty, to ease verification
+                (tx, results) => {
+                  if (results.rowsAffected > 0) {
+                    console.log('dummy data inserted successfully');
+                    console.log(this.state.places);
+                    this._query();
+                  } else {
+                    console.log('error in inserting data');
+                  }
+                },
+              );
+            } else {
+              console.log('table non-empty, no insertion needed');
+            }
+          },
+        ),
+      );
+    });
+  }
+
+  _query() {
+    this.db.transaction(tx =>
+      tx.executeSql('SELECT * FROM places ORDER BY name', [], (tx, results) =>
+        this.setState({places: results.rows.raw()}),
+      ),
+    );
+  }
+
+  openCallback() {
+    console.log('Database open success');
+  }
+  errorCallback(err) {
+    console.log('Error in opening the database: ' + err);
   }
 
   render() {
+    console.log(this.state.places);
     return (
       <>
         <SafeAreaView style={styles.container}>
@@ -30,15 +117,11 @@ export default class HomeScreen extends Component {
                 source={require('../Assets/home_wallpaper.jpg')}
                 style={{
                   width: Dimensions.get('window').width,
-                  height: Dimensions.get('window').height / 4,
+                  // height: Dimensions.get('window').height / 3,
+                  height: '100%',
                 }}></Image>
-              {/* <View style={{position: 'absolute', top: 50, left: 150}}>
-                <Text
-                  style={{color: 'white', fontSize: 35, fontWeight: 'bold'}}>
-                  Penang
-                </Text>
-              </View> */}
             </View>
+            {/* Explore Part */}
             <View style={styles.headerview}>
               <Text style={styles.header}>Explore</Text>
             </View>
@@ -50,7 +133,7 @@ export default class HomeScreen extends Component {
                   alert('you clicked foods');
                 }}>
                 <Image
-                  source={require('../Assets/foods.jpg')}
+                  source={require('../Assets/foods.png')}
                   style={{
                     // marginTop: 20,
                     opacity: 0.9,
@@ -78,7 +161,7 @@ export default class HomeScreen extends Component {
                     alert('you clicked hotels');
                   }}>
                   <Image
-                    source={require('../Assets/hotels.jpg')}
+                    source={require('../Assets/hotels.png')}
                     style={{
                       opacity: 0.9,
                       padding: 20,
@@ -104,7 +187,7 @@ export default class HomeScreen extends Component {
                     alert('you clicked attractions');
                   }}>
                   <Image
-                    source={require('../Assets/attractions.jpg')}
+                    source={require('../Assets/attractions.png')}
                     style={{
                       padding: 20,
                       width: 160,
@@ -126,136 +209,48 @@ export default class HomeScreen extends Component {
                 </TouchableOpacity>
               </View>
             </View>
+
+            {/* Popular Part */}
             <View style={styles.headerview}>
               <Text style={styles.header}>Popular</Text>
             </View>
             <View style={[styles.innercontainer, styles.commoncontainer]}>
-              <ScrollView
+              <FlatList
                 horizontal={true}
-                showsHorizontalScrollIndicator={false}>
-                <TouchableOpacity
-                  style={styles.button}
-                  onPress={() => {
-                    alert('you clicked popular 1');
-                  }}>
-                  <Image
-                    source={require('../Assets/attractions.jpg')}
-                    style={{
-                      padding: 20,
-                      width: 120,
-                      height: 120,
-                      borderRadius: 10,
-                      opacity: 0.9,
-                    }}
-                  />
-                  <View
-                    style={
-                      (styles.innerText, {bottom: 30, alignItems: 'center'})
-                    }>
-                    <Text
-                      style={{
-                        fontSize: 18,
-                        color: 'white',
-                        fontWeight: 'bold',
-                      }}>
-                      Popular 1
-                    </Text>
-                  </View>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.button}
-                  onPress={() => {
-                    alert('you clicked popular 1');
-                  }}>
-                  <Image
-                    source={require('../Assets/attractions.jpg')}
-                    style={{
-                      padding: 20,
-                      width: 120,
-                      height: 120,
-                      borderRadius: 10,
-                      opacity: 0.9,
-                    }}
-                  />
-                  <View
-                    style={
-                      (styles.innerText, {bottom: 30, alignItems: 'center'})
-                    }>
-                    <Text
-                      style={{
-                        fontSize: 18,
-                        color: 'white',
-                        fontWeight: 'bold',
-                      }}>
-                      Popular 2
-                    </Text>
-                  </View>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.button}
-                  onPress={() => {
-                    alert('you clicked popular 1');
-                  }}>
-                  <Image
-                    source={require('../Assets/attractions.jpg')}
-                    style={{
-                      padding: 20,
-                      width: 120,
-                      height: 120,
-                      borderRadius: 10,
-                      opacity: 0.9,
-                    }}
-                  />
-                  <View
-                    style={
-                      (styles.innerText, {bottom: 30, alignItems: 'center'})
-                    }>
-                    <Text
-                      style={{
-                        fontSize: 18,
-                        color: 'white',
-                        fontWeight: 'bold',
-                      }}>
-                      Popular 3
-                    </Text>
-                  </View>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.button}
-                  onPress={() => {
-                    alert('you clicked popular 1');
-                  }}>
-                  <Image
-                    source={require('../Assets/attractions.jpg')}
-                    style={{
-                      padding: 20,
-                      width: 120,
-                      height: 120,
-                      borderRadius: 10,
-                      opacity: 0.9,
-                    }}
-                  />
-                  <View
-                    style={
-                      (styles.innerText, {bottom: 30, alignItems: 'center'})
-                    }>
-                    <Text
-                      style={{
-                        fontSize: 18,
-                        color: 'white',
-                        fontWeight: 'bold',
-                      }}>
-                      Popular 4
-                    </Text>
-                  </View>
-                </TouchableOpacity>
-              </ScrollView>
-              {/* <Text style={styles.basechild}> Child One </Text>
-              <Text style={styles.basechild}> Child Two </Text>
-              <Text style={[styles.basechild, {alignSelf: 'stretch'}]}>
-                Child Three
-              </Text>
-              <Text style={styles.basechild}> Child Four </Text> */}
+                scrollEnabled={true}
+                data={this.state.places}
+                showsVerticalScrollIndicator={true}
+                // refreshing={fetching}
+                renderItem={({item}) => {
+                  return (
+                    <View style={styles.carousel}>
+                      <ImageBackground
+                        source={{uri: item.image}}
+                        style={{width: 140, height: 140}}
+                        imageStyle={{borderRadius: 10}}>
+                        <Text
+                          style={{
+                            color: 'white',
+                            fontWeight: 'bold',
+                            fontSize: 16,
+                            paddingHorizontal: 10,
+                            position: 'absolute',
+                            bottom: 10,
+                          }}>
+                          <Text>{item.name}</Text>
+                          {/* <Text
+                            style={{color: 'blue'}}
+                            onPress={() => {
+                              Linking.openURL(item.website);
+                            }}>
+                            {item.website}
+                          </Text> */}
+                        </Text>
+                      </ImageBackground>
+                    </View>
+                  );
+                }}
+              />
             </View>
           </View>
         </SafeAreaView>
@@ -268,14 +263,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'flex-start',
-    // backgroundColor: 'lightblue',
   },
   button: {
     backgroundColor: '#blue',
     borderRadius: 20,
+    marginTop: 15,
     padding: 10,
-    // marginBottom: 20,
-    // marginLeft: 290,
     shadowColor: '#303838',
     shadowOffset: {width: 0, height: 5},
     shadowRadius: 10,
@@ -283,26 +276,16 @@ const styles = StyleSheet.create({
   },
   commoncontainer: {
     flexDirection: 'row',
-    // backgroundColor: 'lightgreen',
-    // borderColor: 'blue',
-    // borderWidth: 5,
-    // margin: 5,
-    // padding: 10,
   },
   colcontainer: {
     flexDirection: 'column',
-    // backgroundColor: 'blue',
-    // marginTop: 20,
-    // borderColor: 'blue',
-    // borderWidth: 5,
-    // margin: 5,
-    // padding: 10,
+    marginTop: 15,
   },
   innercontainer: {
-    flex: 4,
+    flex: 3.8,
     justifyContent: 'center',
     alignItems: 'center',
-    marginLeft: 10,
+    paddingLeft: 10,
   },
   innerText: {
     bottom: 45,
@@ -311,23 +294,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   basechild: {
-    // color: 'black',
-    // borderColor: 'grey',
-    // borderWidth: 2,
     textAlign: 'justify',
     fontSize: 10,
     fontWeight: 'bold',
     fontFamily: 'monospace',
-    // margin: 10,
-    // padding: 10,
   },
   colbasechild: {
     textAlign: 'justify',
     fontSize: 10,
     fontWeight: 'bold',
     fontFamily: 'monospace',
-    // margin: 5,
-    // padding: 5,
   },
   header: {
     flex: 1,
@@ -335,13 +311,16 @@ const styles = StyleSheet.create({
     color: 'black',
     fontWeight: 'bold',
     padding: 10,
-    // backgroundColor: 'green',
+    marginLeft: 15,
     flexDirection: 'column',
-
     justifyContent: 'flex-end',
-
-    // marginTop: 20,
-    // marginBottom: 20,
+  },
+  carousel: {
+    flexDirection: 'row',
+    padding: 5,
+    paddingTop: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   carouselcomponent: {
     padding: 10,
@@ -352,7 +331,7 @@ const styles = StyleSheet.create({
     width: 150,
   },
   headerview: {
-    flex: 2,
+    flex: 1.3,
     flexDirection: 'column',
     justifyContent: 'flex-end',
   },
