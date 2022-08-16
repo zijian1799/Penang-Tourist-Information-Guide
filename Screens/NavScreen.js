@@ -12,6 +12,11 @@ export default class HomeScreen extends Component {
   render() {
     return (
       <View style={styles.maincontainer}>
+        <Image
+          style={{flex: 3, width: '100%', height: '100%'}}
+          source={{
+            uri: 'https://firebasestorage.googleapis.com/v0/b/wad-assignment-cf7c0.appspot.com/o/thumbnails%2Fpenangwarmuseum.png?alt=media&token=bfb6090d-98b7-4e4e-9345-9b174260e24f',
+          }}></Image>
         <View style={[styles.firstcontainer, styles.commoncontainer]}>
           <Text style={styles.basechild}> Child One </Text>
           <Text style={styles.basechild}> Child Two </Text>
@@ -45,6 +50,10 @@ export default class HomeScreen extends Component {
             slightly less sentences than previously
           </Text>
         </View>
+        <Image
+          source={{
+            uri: 'https://firebasestorage.googleapis.com/v0/b/wad-assignment-cf7c0.appspot.com/o/thumbnails%2Fpenangwarmuseum.png?alt=media&token=bfb6090d-98b7-4e4e-9345-9b174260e24f',
+          }}></Image>
       </View>
     );
   }

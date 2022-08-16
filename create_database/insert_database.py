@@ -1,5 +1,9 @@
 import sqlite3
-db = sqlite3.connect('db.sqlite')
+db = sqlite3.connect('touristguidedb2.sqlite')
+
+
+db.execute('DROP TABLE IF EXISTS places')
+
 
 cursor = db.cursor()
 

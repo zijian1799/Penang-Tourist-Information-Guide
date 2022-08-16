@@ -24,29 +24,18 @@ export default class HomeScreen extends Component {
       places: [],
     };
     this._query = this._query.bind(this);
-    this._databasePrepare = this._databasePrepare.bind(this);
+    // this._databasePrepare = this._databasePrepare.bind(this);
     this.db = SQLite.openDatabase(
-      {name: 'touristguidedb2'},
+      {name: 'touristguidedb3', createFromLocation: '~touristguidedb3.sqlite'},
       this.openCallback,
       this.errorCallback,
     );
   }
   componentDidMount() {
-    this._databasePrepare();
+    // this._databasePrepare();
     this._query();
   }
   _databasePrepare() {
-    // this.db.transaction(tx => {
-    //   console.log('Running drop table');
-    //   tx.executeSql('DROP TABLE IF EXISTS places'),
-    //     [],
-    //     (sqlTxn, res) => {
-    //       console.log('drop successfully');
-    //     },
-    //     error => {
-    //       console.log('error on dropping table' + error.message);
-    //     };
-    // });
     this.db.transaction(tx => {
       tx.executeSql(
         // 'DROP TABLE IF EXISTS places',
@@ -93,8 +82,11 @@ export default class HomeScreen extends Component {
 
   _query() {
     this.db.transaction(tx =>
-      tx.executeSql('SELECT * FROM places ORDER BY name', [], (tx, results) =>
-        this.setState({places: results.rows.raw()}),
+      tx.executeSql(
+        'SELECT * FROM places ORDER BY name',
+        [],
+        (tx, results) => this.setState({places: results.rows.raw()}),
+        // console.log('Table length: ' + results.rows.length),
       ),
     );
   }
@@ -103,11 +95,11 @@ export default class HomeScreen extends Component {
     console.log('Database open success');
   }
   errorCallback(err) {
-    console.log('Error in opening the database: ' + err);
+    console.log('Error in opening the database: ' + err.message);
   }
 
   render() {
-    console.log(this.state.places);
+    // console.log(this.state.places);
     return (
       <>
         <SafeAreaView style={styles.container}>
@@ -135,7 +127,6 @@ export default class HomeScreen extends Component {
                 <Image
                   source={require('../Assets/foods.png')}
                   style={{
-                    // marginTop: 20,
                     opacity: 0.9,
                     width: 160,
                     height: 140,
