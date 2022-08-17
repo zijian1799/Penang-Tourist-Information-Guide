@@ -7,15 +7,11 @@ import {
   Image,
   StyleSheet,
   FlatList,
-  ScrollView,
-  Linking,
+  Button,
   ImageBackground,
 } from 'react-native';
-import {ceil, color} from 'react-native-reanimated';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
-import CategoryScreen from './CategoryScreen';
 
 const win = Dimensions.get('window').width;
 let SQLite = require('react-native-sqlite-storage');
@@ -25,6 +21,7 @@ export default class HomeScreen extends Component {
     super(props);
     this.state = {
       places: [],
+      populars: [],
     };
     this._query = this._query.bind(this);
     // this._databasePrepare = this._databasePrepare.bind(this);
@@ -92,6 +89,14 @@ export default class HomeScreen extends Component {
         // console.log('Table length: ' + results.rows.length),
       ),
     );
+    this.db.transaction(tx =>
+      tx.executeSql(
+        'SELECT * FROM places WHERE category="attraction"',
+        [],
+        (tx, results) => this.setState({populars: results.rows.raw()}),
+        // console.log('Table length: ' + results.rows.length),
+      ),
+    );
   }
 
   openCallback() {
@@ -102,7 +107,7 @@ export default class HomeScreen extends Component {
   }
 
   render() {
-    // console.log(this.state.places);
+    // console.log(this.state.populars);
     return (
       <>
         <SafeAreaView style={styles.container}>
@@ -120,12 +125,14 @@ export default class HomeScreen extends Component {
             <View style={styles.headerview}>
               <Text style={styles.header}>Explore</Text>
             </View>
-            {/* <CategoryNavigator /> */}
+            {/* <CategoryNavigator></CategoryNavigator> */}
             <View style={[styles.innercontainer, styles.commoncontainer]}>
               <TouchableOpacity
                 style={[styles.button, styles.basechild]}
                 onPress={() => {
-                  // alert('you clicked foods');
+                  this.props.navigation.navigate('categoryScreen', {
+                    category: 'food',
+                  });
                 }}>
                 <Image
                   source={require('../Assets/foods.png')}
@@ -152,17 +159,13 @@ export default class HomeScreen extends Component {
                 <TouchableOpacity
                   style={(styles.button, styles.colbasechild)}
                   onPress={() => {
-                    alert('you clicked hotels');
+                    this.props.navigation.navigate('categoryScreen', {
+                      category: 'hotel',
+                    });
                   }}>
                   <Image
                     source={require('../Assets/hotels.png')}
-                    style={{
-                      opacity: 0.9,
-                      padding: 20,
-                      width: 160,
-                      height: 60,
-                      borderRadius: 10,
-                    }}
+                    style={styles.colCategoryImg}
                   />
                   <View style={styles.innerText}>
                     <Text
@@ -178,17 +181,13 @@ export default class HomeScreen extends Component {
                 <TouchableOpacity
                   style={(styles.button, styles.colbasechild)}
                   onPress={() => {
-                    alert('you clicked attractions');
+                    this.props.navigation.navigate('categoryScreen', {
+                      category: 'attraction',
+                    });
                   }}>
                   <Image
                     source={require('../Assets/attractions.png')}
-                    style={{
-                      padding: 20,
-                      width: 160,
-                      height: 60,
-                      borderRadius: 10,
-                      opacity: 0.9,
-                    }}
+                    style={styles.colCategoryImg}
                   />
                   <View style={styles.innerText}>
                     <Text
@@ -212,35 +211,43 @@ export default class HomeScreen extends Component {
               <FlatList
                 horizontal={true}
                 scrollEnabled={true}
-                data={this.state.places}
+                data={this.state.populars}
                 showsVerticalScrollIndicator={true}
                 // refreshing={fetching}
                 renderItem={({item}) => {
                   return (
                     <View style={styles.carousel}>
-                      <ImageBackground
-                        source={{uri: item.image}}
-                        style={{width: 140, height: 140}}
-                        imageStyle={{borderRadius: 10}}>
-                        <Text
-                          style={{
-                            color: 'white',
-                            fontWeight: 'bold',
-                            fontSize: 16,
-                            paddingHorizontal: 10,
-                            position: 'absolute',
-                            bottom: 10,
-                          }}>
-                          <Text>{item.name}</Text>
-                          {/* <Text
+                      <TouchableOpacity
+                        style={styles.carouselButton}
+                        onPress={() => {
+                          this.props.navigation.navigate('detailsScreen', {
+                            id: item.place_id,
+                          });
+                        }}>
+                        <ImageBackground
+                          source={{uri: item.image}}
+                          style={{width: 140, height: 140}}
+                          imageStyle={{borderRadius: 10}}>
+                          <Text
+                            style={{
+                              color: 'white',
+                              fontWeight: 'bold',
+                              fontSize: 16,
+                              paddingHorizontal: 10,
+                              position: 'absolute',
+                              bottom: 10,
+                            }}>
+                            <Text>{item.name}</Text>
+                            {/* <Text
                             style={{color: 'blue'}}
                             onPress={() => {
                               Linking.openURL(item.website);
                             }}>
                             {item.website}
                           </Text> */}
-                        </Text>
-                      </ImageBackground>
+                          </Text>
+                        </ImageBackground>
+                      </TouchableOpacity>
                     </View>
                   );
                 }}
@@ -249,41 +256,6 @@ export default class HomeScreen extends Component {
           </View>
         </SafeAreaView>
       </>
-    );
-  }
-}
-
-const StackNav = createStackNavigator();
-
-class CategoryNavigator extends Component {
-  render() {
-    return (
-      <StackNav.Navigator>
-        <StackNav.Screen name="food" component={CategoryScreen}>
-          <Image
-            source={require('../Assets/foods.png')}
-            style={{
-              opacity: 0.9,
-              width: 160,
-              height: 140,
-              borderRadius: 20,
-            }}
-          />
-          <View style={styles.innerText}>
-            <Text
-              style={{
-                bottom: 50,
-                fontSize: 25,
-                color: 'white',
-                fontWeight: 'bold',
-              }}>
-              Foods
-            </Text>
-          </View>
-        </StackNav.Screen>
-        {/* <StackNav.Screen name="hotel" component={CategoryScreen} />
-        <StackNav.Screen name="attraction" component={CategoryScreen} /> */}
-      </StackNav.Navigator>
     );
   }
 }
@@ -298,6 +270,16 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     marginTop: 15,
     padding: 10,
+    shadowColor: '#303838',
+    shadowOffset: {width: 0, height: 5},
+    shadowRadius: 10,
+    shadowOpacity: 0.35,
+  },
+  carouselButton: {
+    backgroundColor: '#blue',
+    borderRadius: 20,
+    marginTop: 0,
+    // padding: 10,
     shadowColor: '#303838',
     shadowOffset: {width: 0, height: 5},
     shadowRadius: 10,
@@ -347,9 +329,9 @@ const styles = StyleSheet.create({
   carousel: {
     flexDirection: 'row',
     padding: 5,
-    paddingTop: 0,
-    alignItems: 'center',
-    justifyContent: 'center',
+    // paddingTop: 0,
+    // alignItems: 'center',
+    // justifyContent: 'center',
   },
   carouselcomponent: {
     padding: 10,
@@ -363,5 +345,13 @@ const styles = StyleSheet.create({
     flex: 1.3,
     flexDirection: 'column',
     justifyContent: 'flex-end',
+    // backgroundColor: 'green',
+  },
+  colCategoryImg: {
+    opacity: 0.9,
+    padding: 20,
+    width: 160,
+    height: 60,
+    borderRadius: 10,
   },
 });

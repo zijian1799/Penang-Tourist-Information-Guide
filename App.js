@@ -2,51 +2,16 @@ import * as React from 'react';
 import {Text, View, StyleSheet} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import {createStackNavigator} from '@react-navigation/stack';
 
-import HomeScreen from './Screens/HomeScreen';
-import NavScreen from './Screens/NavScreen';
+import Icon from 'react-native-vector-icons/FontAwesome';
 import FavScreen from './Screens/FavScreen';
 import ProfileScreen from './Screens/ProfileScreen';
 import SearchScreen from './Screens/SearchScreen';
+import HomeNavigator from './HomeNavigator';
 
-// function HomeScreen() {
-//   return (
-//     <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-//       <Text>HomeScreen</Text>
-//     </View>
-//   );
-// }
-
-// function NavScreen() {
-//   return (
-//     <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-//       <Text>NavScreen</Text>
-//     </View>
-//   );
-// }
-// function ProfileScreen() {
-//   return (
-//     <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-//       <Text>ProfileScreen</Text>
-//     </View>
-//   );
-// }
-// function SearchScreen() {
-//   return (
-//     <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-//       <Text>SearchScreen</Text>
-//     </View>
-//   );
-// }
-// function FavScreen() {
-//   return (
-//     <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-//       <Text>FavScreen</Text>
-//     </View>
-//   );
-// }
 const Tab = createBottomTabNavigator();
+const StackNav = createStackNavigator();
 
 export default function App() {
   return (
@@ -67,9 +32,8 @@ export default function App() {
 
         <Tab.Screen
           name="Home"
-          component={HomeScreen}
-          options={styles.homeOptions}
-        />
+          component={HomeNavigator}
+          options={styles.homeOptions}></Tab.Screen>
         {/* <Tab.Screen
           name="Navigation"
           component={NavScreen}
