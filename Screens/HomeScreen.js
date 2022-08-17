@@ -13,6 +13,9 @@ import {
 } from 'react-native';
 import {ceil, color} from 'react-native-reanimated';
 import {SafeAreaView} from 'react-native-safe-area-context';
+import {NavigationContainer} from '@react-navigation/native';
+import {createStackNavigator} from '@react-navigation/stack';
+import CategoryScreen from './CategoryScreen';
 
 const win = Dimensions.get('window').width;
 let SQLite = require('react-native-sqlite-storage');
@@ -26,7 +29,7 @@ export default class HomeScreen extends Component {
     this._query = this._query.bind(this);
     // this._databasePrepare = this._databasePrepare.bind(this);
     this.db = SQLite.openDatabase(
-      {name: 'touristguidedb3', createFromLocation: '~touristguidedb3.sqlite'},
+      {name: 'touristguidedb4', createFromLocation: '~touristguidedb4.sqlite'},
       this.openCallback,
       this.errorCallback,
     );
@@ -106,7 +109,7 @@ export default class HomeScreen extends Component {
           <View style={styles.container}>
             <View style={{flex: 5}}>
               <Image
-                source={require('../Assets/home_wallpaper.jpg')}
+                source={require('../Assets/penangWallpaper.png')}
                 style={{
                   width: Dimensions.get('window').width,
                   // height: Dimensions.get('window').height / 3,
@@ -117,12 +120,12 @@ export default class HomeScreen extends Component {
             <View style={styles.headerview}>
               <Text style={styles.header}>Explore</Text>
             </View>
-
+            {/* <CategoryNavigator /> */}
             <View style={[styles.innercontainer, styles.commoncontainer]}>
               <TouchableOpacity
                 style={[styles.button, styles.basechild]}
                 onPress={() => {
-                  alert('you clicked foods');
+                  // alert('you clicked foods');
                 }}>
                 <Image
                   source={require('../Assets/foods.png')}
@@ -246,6 +249,41 @@ export default class HomeScreen extends Component {
           </View>
         </SafeAreaView>
       </>
+    );
+  }
+}
+
+const StackNav = createStackNavigator();
+
+class CategoryNavigator extends Component {
+  render() {
+    return (
+      <StackNav.Navigator>
+        <StackNav.Screen name="food" component={CategoryScreen}>
+          <Image
+            source={require('../Assets/foods.png')}
+            style={{
+              opacity: 0.9,
+              width: 160,
+              height: 140,
+              borderRadius: 20,
+            }}
+          />
+          <View style={styles.innerText}>
+            <Text
+              style={{
+                bottom: 50,
+                fontSize: 25,
+                color: 'white',
+                fontWeight: 'bold',
+              }}>
+              Foods
+            </Text>
+          </View>
+        </StackNav.Screen>
+        {/* <StackNav.Screen name="hotel" component={CategoryScreen} />
+        <StackNav.Screen name="attraction" component={CategoryScreen} /> */}
+      </StackNav.Navigator>
     );
   }
 }

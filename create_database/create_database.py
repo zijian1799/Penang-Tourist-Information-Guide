@@ -1,7 +1,9 @@
 import sqlite3
-db = sqlite3.connect('touristguidedb3.sqlite')
+db = sqlite3.connect('touristguidedb4.sqlite')
+
 
 db.execute('DROP TABLE IF EXISTS places')
+
 db.execute('''CREATE TABLE places(
     place_id integer PRIMARY KEY AUTOINCREMENT,
     name text NOT NULL,
@@ -14,6 +16,7 @@ db.execute('''CREATE TABLE places(
     website text NOT NULL,
     contact text NOT NULL
 )''')
+db.execute('DELETE FROM places')
 
 db.execute('DROP TABLE IF EXISTS users')
 db.execute('''CREATE TABLE users(
@@ -102,7 +105,7 @@ cursor.execute('''
 cursor.execute('''
     INSERT INTO places(name,description,category,image,location,operatinghours,priceRange,website,contact)
     VALUES('Penang Street Art','UNESCO World Heritage Site featuring graphic street art depicting the life of the people of Penang.',
-    'attraction','https://firebasestorage.googleapis.com/v0/b/wad-assignment-cf7c0.appspot.com/o/thumbnails%2Fpenangnationalpark.png?alt=media&token=b6841145-eadb-4aa6-95aa-8bd45b50c499', 
+    'attraction','https://firebasestorage.googleapis.com/v0/b/wad-assignment-cf7c0.appspot.com/o/thumbnails%2Fstreetart.png?alt=media&token=36440518-7de8-4926-b74c-7eeb3d08a4e4', 
     '316, Beach St, Georgetown, 10300 George Town, Penang','24 hours ',0,'not available', 'not available')
 ''')
 
@@ -110,7 +113,26 @@ cursor.execute('''
 cursor.execute('''
     INSERT INTO users(name,email,birthDate,password)VALUES('anthony','anthony@gmail.com', 20000715,'anthony')
 ''')
+cursor.execute('''
+    INSERT INTO users(name,email,birthDate,password)VALUES('Elisa','elisa@gmail.com', 20000715,'elisa')
+''')
+cursor.execute('''
+    INSERT INTO users(name,email,birthDate,password)VALUES('Weldon','weldon@gmail.com', 20000715,'weldon')
+''')
 
+
+db.execute('''CREATE TABLE ratings_and_reviews(
+    reviews_id integer PRIMARY KEY AUTOINCREMENT,
+    place_id integer NOT NULL,
+    date text NOT NULL,
+    ratingStars text NOT NULL,
+    comment text NOT NULL,
+    FOREIGN KEY(place_id) REFERENCES places(place_id)
+)''')
+
+cursor.execute('''
+    INSERT INTO users(name,email,birthDate,password)VALUES('Weldon','weldon@gmail.com', 20000715,'weldon')
+''')
 
 db.commit()
 db.close()

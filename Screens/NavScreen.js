@@ -1,5 +1,7 @@
 import React, {Component} from 'react';
 import {View, Text, TouchableOpacity, Image, StyleSheet} from 'react-native';
+// import Icon from 'react-native-ionicons';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 export default class HomeScreen extends Component {
   constructor(props) {
@@ -12,11 +14,13 @@ export default class HomeScreen extends Component {
   render() {
     return (
       <View style={styles.maincontainer}>
-        <Image
+        <Icon name="home" size={40} color="black" />
+
+        {/* <Image
           style={{flex: 3, width: '100%', height: '100%'}}
           source={{
             uri: 'https://firebasestorage.googleapis.com/v0/b/wad-assignment-cf7c0.appspot.com/o/thumbnails%2Fpenangwarmuseum.png?alt=media&token=bfb6090d-98b7-4e4e-9345-9b174260e24f',
-          }}></Image>
+          }}></Image> */}
         <View style={[styles.firstcontainer, styles.commoncontainer]}>
           <Text style={styles.basechild}> Child One </Text>
           <Text style={styles.basechild}> Child Two </Text>
