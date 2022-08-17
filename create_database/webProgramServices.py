@@ -3,7 +3,7 @@ from flask import Flask, jsonify, request, abort
 from argparse import ArgumentParser
 
 
-DB = 'touristguidedb4.sqlite'
+DB = 'touristguidedb5.sqlite'
 
 def places_get_row_as_dict(row):
     row_dict = {
@@ -76,7 +76,22 @@ def index():
 
     return jsonify(rows_as_dict), 200
 
+@app.route('/api/places/<string:category>', methods=['GET'])
+def show(category):
+    db = sqlite3.connect(DB)
+    cursor = db.cursor()
+    cursor.execute('SELECT * FROM places WHERE category=?', (str(category),))
+    rows = cursor.fetchall()
+    print(rows)
 
+    db.close()
+
+    rows_as_dict = []
+    for row in rows:
+        row_as_dict = places_get_row_as_dict(row)
+        rows_as_dict.append(row_as_dict)
+
+    return jsonify(rows_as_dict), 200
 
 
 if __name__ == '__main__':

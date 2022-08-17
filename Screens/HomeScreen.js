@@ -26,7 +26,7 @@ export default class HomeScreen extends Component {
     this._query = this._query.bind(this);
     // this._databasePrepare = this._databasePrepare.bind(this);
     this.db = SQLite.openDatabase(
-      {name: 'touristguidedb4', createFromLocation: '~touristguidedb4.sqlite'},
+      {name: 'touristguidedb5', createFromLocation: '~touristguidedb5.sqlite'},
       this.openCallback,
       this.errorCallback,
     );
