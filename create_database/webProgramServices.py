@@ -1,7 +1,8 @@
+from os import access
 import sqlite3
+from unicodedata import name
 from flask import Flask, jsonify, request, abort
 from argparse import ArgumentParser
-
 
 DB = 'touristguidedb5.sqlite'
 
@@ -22,18 +23,14 @@ def places_get_row_as_dict(row):
     return row_dict
 
 
-def users_get_row_as_dict(row):
+def user_get_row_as_dict(row):
     row_dict = {
         'user_id': row[0],
-        'name': row[1],
-        'email': row[2],
-        'birthDate': row[3],
+        'name': row[1],        
         'password': row[4],
     }
 
     return row_dict
-
-
     
 def reviews_get_row_as_dict(row):
     row_dict = {
@@ -56,7 +53,6 @@ def favourite_get_row_as_dict(row):
     return row_dict
     
 app = Flask(__name__)
-
 
 @app.route('/api/places', methods=['GET'])
 def index():
@@ -93,6 +89,25 @@ def show(category):
 
     return jsonify(rows_as_dict), 200
 
+@app.route('/api/login', methods=['POST'])
+def get_user():
+    username = request.json.get("username", None)
+    password = request.json.get("password", None)
+
+    db = sqlite3.connect(DB)
+    cursor = db.cursor()
+    cursor.execute('SELECT * FROM users WHERE name=?', (str(username),))
+    data = cursor.fetchone()
+    db.close()
+
+    if data:
+        row_as_dict = user_get_row_as_dict(data)
+        if row_as_dict['name'] != username or row_as_dict['password'] != password:        
+            return jsonify({"Wrong username or password."}), 200
+        else:
+            return jsonify(row_as_dict), 200
+    else:  
+        return jsonify(None), 200       
 
 if __name__ == '__main__':
     parser = ArgumentParser()
