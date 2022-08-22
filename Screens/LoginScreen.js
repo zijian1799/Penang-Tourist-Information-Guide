@@ -1,106 +1,110 @@
 import React, {Component} from 'react';
-import {
-  StyleSheet,
-  Text,
-  View,
-  TextInput,
-  TimePickerAndroid,
-  TouchableWithoutFeedback,
-} from 'react-native';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { TextInput } from 'react-native-gesture-handler';
+import {Alert, Button, StyleSheet, View, Text} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+let config = require('../Config');
 
-Date.prototype.formatted = function () {
-  let day = this.getDay();
-  let date = this.getDate();
-  let month = this.getMonth();
-  let year = this.getFullYear();
-  let daysText = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-  let monthsText = [
-    'Jan',
-    'Feb',
-    'Mar',
-    'Apr',
-    'May',
-    'Jun',
-    'Jul',
-    'Aug',
-    'Sep',
-    'Oct',
-    'Nov',
-    'Dec',
-  ];
-  return `${daysText[day]}, ${monthsText[month]} ${date}, ${year}`;
-};
-export default class App extends Component {
-  constructor(props) {
+export default class LoginScreen extends Component {  
+  constructor(props){
     super(props);
-    this.state = {
-      title: '',
-      hour: null,
-      minute: null,
-      timeText: '',
-      date: new Date(Date.now()),
-      openPicker: false,
-    };
-    this.openTimePicker = this.openTimePicker.bind(this);
-    this.onDateSelected = this.onDateSelected.bind(this);
-  }
-  openTimePicker() {
-    this.setState({openPicker: true});
-  }
-  onDateSelected(event, value) {
-    this.setState({
-      date: value,
-      openPicker: false,
-    });
-  }
-  render() {
-    return (
-      <View style={styles.container}>
-        <TouchableWithoutFeedback onPress={this.openTimePicker}>
-          <View>
-            <TextInput
-              style={styles.input}
-              value={this.state.date.formatted()}
-              placeholder="Event Time"
-              editable={false}
-              underlineColorAndroid={'transparent'}
-            />
-          </View>
-        </TouchableWithoutFeedback>
 
-        {this.state.openPicker && (
-          <DateTimePicker
-            value={this.state.date}
-            mode={'date'}
-            display={Platform.OS === 'ios' ? 'spinner' : 'calendar'}
-            is24Hour={false}
-            onChange={this.onDateSelected}
-            style={styles.datePicker}
-          />
-        )}
+    this.state = {
+      username:'',      
+      password:'',
+      user:[],      
+      isFetching: false,
+    };
+  }
+  
+  saveUser = async (user) => {
+    try{
+      var User = {
+        username: user.name,
+        password: user.password
+      }
+      await AsyncStorage.setItem('UserDetail', JSON.stringify(User));
+    } catch (error){
+      console.log(error)
+    }
+  }
+
+  _login(){
+    let url = config.settings.serverPath + '/api/login';
+    this.setState({isFetching: true});
+    
+    fetch(url, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type' : 'application/json',
+      },
+      body: JSON.stringify({
+        username: this.state.username,
+        password: this.state.password,
+      })
+    })
+      .then(response => {
+        if (!response.ok){
+          Alert.alert('Error:', 'Wrong username and password combination');                   
+        }
+        this.setState({isFetching: false});
+        return response.json();
+      })
+      .then(data => {   
+        if (data != null){
+          this.setState({user: data});
+
+          this.props.navigation.navigate('content');
+        }   
+        this.setState({user: data}); 
+      })
+      .catch(error => {
+        console.error("There was an error", error);
+      })
+  }
+
+  render(){
+    const pressHandler = () => {
+      if (this.state.username === ''){
+        Alert.alert('Please enter username');
+      }else if (this.state.password === ''){
+        Alert.alert('Please enter password.');
+      }else{        
+        this._login();
+      }
+    };
+
+    return(
+      <View>
+        <Text>Login</Text>        
+        <TextInput 
+          style = {styles.input} 
+          placeholder = {"Username:"} 
+          onChangeText = {username => this.setState({username})}
+        />
+        <TextInput 
+          style = {styles.input} 
+          placeholder = {"Password:"}
+          keyboardType = {'default'} 
+          secureTextEntry 
+          onChangeText = {password => this.setState({password})}
+        />
+        <Button
+          title= "Log In"
+          onPress={pressHandler} />
       </View>
+        
     );
   }
 }
+
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'flex-start',
-    padding: 10,
-  },
-  input: {
-    fontSize: 20,
-    height: 48,
-    color: 'black',
-    borderBottomWidth: 2,
-    borderBottomColor: 'red',
-  },
-  datePicker: {
-    justifyContent: 'center',
-    alignItems: 'flex-start',
-    width: 320,
-    height: 260,
-    display: 'flex',
-  },
-});
+  input:{
+    width: 200,
+    padding: 20,
+    borderRadius: 30,
+  }
+
+
+})
