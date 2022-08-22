@@ -103,7 +103,7 @@ def get_user():
     if data:
         row_as_dict = user_get_row_as_dict(data)
         if row_as_dict['name'] != username or row_as_dict['password'] != password:        
-            return jsonify({"Wrong username or password."}), 200
+            return jsonify(None), 401
         else:
             return jsonify(row_as_dict), 200
     else:  
