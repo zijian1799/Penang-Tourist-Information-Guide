@@ -2,7 +2,6 @@ import React, {Component} from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TextInput } from 'react-native-gesture-handler';
 import {Alert, Button, StyleSheet, View, Text} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 let config = require('../Config');
 
 export default class LoginScreen extends Component {  
@@ -14,9 +13,26 @@ export default class LoginScreen extends Component {
       password:'',
       user:[],      
       isFetching: false,
-    };
+    };    
   }
-  
+
+  componentDidMount(){
+    this.validateUser();
+  }
+
+  validateUser = () =>{
+    try{
+      AsyncStorage.getItem('UserData')
+        .then(value =>{
+          if (value != null){
+            navigation.navigate('content');
+          }
+        })
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   saveUser = async (user) => {
     try{
       var User = {
