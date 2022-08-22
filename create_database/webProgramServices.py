@@ -73,7 +73,7 @@ def index():
     return jsonify(rows_as_dict), 200
 
 @app.route('/api/places/<string:category>', methods=['GET'])
-def show(category):
+def show_category(category):
     db = sqlite3.connect(DB)
     cursor = db.cursor()
     cursor.execute('SELECT * FROM places WHERE category=?', (str(category),))
@@ -107,7 +107,21 @@ def get_user():
         else:
             return jsonify(row_as_dict), 200
     else:  
-        return jsonify(None), 200       
+        return jsonify(None), 200    
+
+@app.route('/api/places/<int:id>', methods=['GET'])
+def show(id):
+    db = sqlite3.connect(DB)
+    cursor = db.cursor()
+    cursor.execute('SELECT * FROM places WHERE place_id=?', (int(id),))
+    row = cursor.fetchone()
+    db.close()
+
+    if row:
+        row_as_dict = places_get_row_as_dict(row)
+        return jsonify(row_as_dict), 200
+    else:
+        return jsonify(None), 200
 
 if __name__ == '__main__':
     parser = ArgumentParser()
