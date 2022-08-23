@@ -27,10 +27,8 @@ export default class ProfileScreen extends Component {
       let email = await AsyncStorage.getItem('Email');
       
       if (username !== null){                     
-        this.setState({username: username});
-        console.log(this.state.username)
-        this.setState({email: email})    
-        console.log(this.state.email)
+        this.setState({username: username});        
+        this.setState({email: email});            
       }
     }catch (error){
       console.log('Error loading user details.', error)
