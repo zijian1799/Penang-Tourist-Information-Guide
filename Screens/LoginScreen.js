@@ -36,8 +36,9 @@ export default class LoginScreen extends Component {
     try{
       var User = {
         username: user.name,
+        email: user.email,
         password: user.password
-      }
+      }      
       await AsyncStorage.setItem('UserDetail', JSON.stringify(User));
     } catch (error){
       console.log(error)
