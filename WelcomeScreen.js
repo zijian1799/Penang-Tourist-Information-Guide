@@ -16,7 +16,7 @@ export default class WelcomeScreen extends Component {
         <Button
           style={styles.button}
           title="Get Started"
-          onPress={() => this.props.navigation.navigate('content')}
+          onPress={() => this.props.navigation.navigate('auth')}
         />
       </ImageBackground>
     );

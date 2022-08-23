@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
 import CategoryScreen from './Screens/CategoryScreen';
-import DetailsScreen from './Screens/DetailsScreen';
+import DetailNavigator from './Screens/DetailNavigator';
 
 import HomeScreen from './Screens/HomeScreen';
 
@@ -23,7 +23,7 @@ export default class HomeNavigator extends Component {
           component={CategoryScreen}></Stack.Screen>
         <Stack.Screen
           name="detailsScreen"
-          component={DetailsScreen}></Stack.Screen>
+          component={DetailNavigator}></Stack.Screen>
       </Stack.Navigator>
     );
   }

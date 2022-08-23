@@ -1,106 +1,149 @@
 import React, {Component} from 'react';
-import {
-  StyleSheet,
-  Text,
-  View,
-  TextInput,
-  TimePickerAndroid,
-  TouchableWithoutFeedback,
-} from 'react-native';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { TextInput } from 'react-native-gesture-handler';
+import {Alert, Button, StyleSheet, View, Text, TouchableOpacity} from 'react-native';
+let config = require('../Config');
 
-Date.prototype.formatted = function () {
-  let day = this.getDay();
-  let date = this.getDate();
-  let month = this.getMonth();
-  let year = this.getFullYear();
-  let daysText = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-  let monthsText = [
-    'Jan',
-    'Feb',
-    'Mar',
-    'Apr',
-    'May',
-    'Jun',
-    'Jul',
-    'Aug',
-    'Sep',
-    'Oct',
-    'Nov',
-    'Dec',
-  ];
-  return `${daysText[day]}, ${monthsText[month]} ${date}, ${year}`;
-};
-export default class App extends Component {
-  constructor(props) {
+export default class LoginScreen extends Component {  
+  constructor(props){
     super(props);
-    this.state = {
-      title: '',
-      hour: null,
-      minute: null,
-      timeText: '',
-      date: new Date(Date.now()),
-      openPicker: false,
-    };
-    this.openTimePicker = this.openTimePicker.bind(this);
-    this.onDateSelected = this.onDateSelected.bind(this);
-  }
-  openTimePicker() {
-    this.setState({openPicker: true});
-  }
-  onDateSelected(event, value) {
-    this.setState({
-      date: value,
-      openPicker: false,
-    });
-  }
-  render() {
-    return (
-      <View style={styles.container}>
-        <TouchableWithoutFeedback onPress={this.openTimePicker}>
-          <View>
-            <TextInput
-              style={styles.input}
-              value={this.state.date.formatted()}
-              placeholder="Event Time"
-              editable={false}
-              underlineColorAndroid={'transparent'}
-            />
-          </View>
-        </TouchableWithoutFeedback>
 
-        {this.state.openPicker && (
-          <DateTimePicker
-            value={this.state.date}
-            mode={'date'}
-            display={Platform.OS === 'ios' ? 'spinner' : 'calendar'}
-            is24Hour={false}
-            onChange={this.onDateSelected}
-            style={styles.datePicker}
+    this.state = {
+      username:'',      
+      password:'',
+      user:[],     
+    };    
+  }
+
+  componentDidMount(){
+    this._validateUser();
+  }
+
+  async _validateUser(){
+    try{
+      AsyncStorage.getItem('UserData')
+        .then(value =>{
+          if (value != null){
+            navigation.navigate('content');
+          }
+        })
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async _saveUser(user){
+    try{
+      var User = {
+        username: user.name,
+        email: user.email,
+        password: user.password
+      }      
+      await AsyncStorage.setItem('UserDetail', JSON.stringify(User));
+    } catch (error){
+      console.log(error)
+    }
+  }
+
+  _login(){
+    let url = config.settings.serverPath + '/api/login';    
+    
+    fetch(url, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type' : 'application/json',
+      },
+      body: JSON.stringify({
+        username: this.state.username,
+        password: this.state.password,
+      })
+    })
+      .then(response => {
+        if (!response.ok){
+          Alert.alert('Error:', 'Wrong username and password combination');                   
+        }        
+        return response.json();
+      })
+      .then(data => {   
+        if (data != null){
+          this.setState({user: data});
+          this._saveUser(this.state.user);
+          this.props.navigation.navigate('content');
+        }           
+      })
+      .catch(error => {
+        console.error("There was an error", error);
+      })
+  }
+
+  render(){
+    const pressHandler = () => {
+      if (this.state.username === ''){
+        Alert.alert('Please enter username');
+      }else if (this.state.password === ''){
+        Alert.alert('Please enter password.');
+      }else{        
+        this._login();
+      }
+    };
+
+    return(
+      <View style={styles.container}>
+        <Text style = {styles.title}>Login</Text>
+        <View style={styles.inputView}>       
+          <TextInput 
+            style = {styles.inputText} 
+            placeholder = {"Username:"} 
+            onChangeText = {username => this.setState({username})}
           />
-        )}
-      </View>
+        </View>
+        <View style={styles.inputView}>   
+          <TextInput 
+            style = {styles.inputText} 
+            placeholder = {"Password:"}
+            secureTextEntry 
+            onChangeText = {password => this.setState({password})}
+          />
+        </View>
+          <Button
+            title= "Log In"
+            onPress={pressHandler} />
+          <TouchableOpacity onPress = {() => this.props.navigation.navigate('signup')}>
+            <Text style={styles.signup}>Do not have an ID? Let's sign up.</Text>            
+          </TouchableOpacity>
+      </View>        
     );
   }
 }
+
 const styles = StyleSheet.create({
-  container: {
+  container:{
     flex: 1,
-    justifyContent: 'flex-start',
-    padding: 10,
-  },
-  input: {
-    fontSize: 20,
-    height: 48,
-    color: 'black',
-    borderBottomWidth: 2,
-    borderBottomColor: 'red',
-  },
-  datePicker: {
+    backgroundColor: 'lightblue',
     justifyContent: 'center',
-    alignItems: 'flex-start',
-    width: 320,
-    height: 260,
-    display: 'flex',
+    alignItems: 'center',
   },
-});
+  title:{
+    fontSize: 30,
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  inputView:{
+    width: "80%",
+    backgroundColor: 'white',
+    borderRadius: 25,
+    height: 50,
+    marginBottom: 30,
+    justifyContent: 'center',
+    padding:20,    
+  },
+  inputText:{
+    height:50,
+  },
+  signup:{
+    color: '#3399FF',
+    paddingTop: 20,
+    fontSize: 20,
+  }
+})

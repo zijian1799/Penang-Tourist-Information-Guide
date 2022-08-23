@@ -23,7 +23,6 @@ db.execute('''CREATE TABLE users(
     user_id integer PRIMARY KEY AUTOINCREMENT,
     name text NOT NULL,
     email text NOT NULL,
-    birthDate text NOT NULL,
     password text NOT NULL
 )''')
 
@@ -179,13 +178,13 @@ cursor.execute('''
 ''')
 
 cursor.execute('''
-    INSERT INTO users(name,email,birthDate,password)VALUES('anthony','anthony@gmail.com', 'Fri, Aug 18, 2000','anthony')
+    INSERT INTO users(name,email,password)VALUES('anthony','anthony@gmail.com','anthony')
 ''')
 cursor.execute('''
-    INSERT INTO users(name,email,birthDate,password)VALUES('Elisa','elisa@gmail.com', 'Sat, Aug 19, 2000','elisa')
+    INSERT INTO users(name,email,password)VALUES('Elisa','elisa@gmail.com', 'elisa')
 ''')
 cursor.execute('''
-    INSERT INTO users(name,email,birthDate,password)VALUES('Weldon','weldon@gmail.com', 'Sun, Aug 20, 2000','weldon')
+    INSERT INTO users(name,email,password)VALUES('Weldon','weldon@gmail.com', 'weldon')
 ''')
 
 
