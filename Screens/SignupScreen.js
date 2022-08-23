@@ -34,6 +34,17 @@ export default class SignupScreen extends Component {
       console.log(error)
     }
   }
+  async _saveUser(){
+    try{
+      let username = this.state.username
+      let email = this.state.email
+          
+      await AsyncStorage.setItem('Username', username);
+      await AsyncStorage.setItem('Email', email);
+    } catch (error){
+      console.log(error)
+    }
+  }
   _register(){
     let url = config.settings.serverPath + '/api/register';    
     
@@ -80,6 +91,8 @@ export default class SignupScreen extends Component {
         Alert.alert('The retype password field is required.')
       }else if (this.state.password != this.state.retypePassword){        
         Alert.alert('Password mismatch.')
+      }else if (!this.state.email.includes("@") || !this.state.email.includes(".")){
+        Alert.alert('Please enter a valid email address.')
       }else{
         this._register();
       }
