@@ -31,7 +31,6 @@ db.execute('''CREATE TABLE ratings_and_reviews(
     reviews_id integer PRIMARY KEY AUTOINCREMENT,
     place_id integer NOT NULL,
     date text NOT NULL,
-    ratingStars text NOT NULL,
     comment text NOT NULL,
     FOREIGN KEY(place_id) REFERENCES places(place_id)
 )''')
@@ -189,31 +188,31 @@ cursor.execute('''
 
 
 cursor.execute('''
-    INSERT INTO ratings_and_reviews(place_id,date,ratingStars,comment)VALUES(1,'Thu, Aug 18, 2022', 3,'This is a nice place.')
+    INSERT INTO ratings_and_reviews(place_id,date,comment)VALUES(1,'Thu, Aug 18, 2022', 'This is a nice place.')
 ''')
 cursor.execute('''
-    INSERT INTO ratings_and_reviews(place_id,date,ratingStars,comment)VALUES(2,'Thu, Aug 18, 2022', 3,'This is a nice place.')
+    INSERT INTO ratings_and_reviews(place_id,date,comment)VALUES(2,'Thu, Aug 18, 2022', 'This is a nice place.')
 ''')
 cursor.execute('''
-    INSERT INTO ratings_and_reviews(place_id,date,ratingStars,comment)VALUES(3,'Thu, Aug 18, 2022', 3,'This is a nice place.')
+    INSERT INTO ratings_and_reviews(place_id,date,comment)VALUES(3,'Thu, Aug 18, 2022', 'This is a nice place.')
 ''')
 cursor.execute('''
-    INSERT INTO ratings_and_reviews(place_id,date,ratingStars,comment)VALUES(4,'Thu, Aug 18, 2022', 3,'This is a nice place.')
+    INSERT INTO ratings_and_reviews(place_id,date,comment)VALUES(4,'Thu, Aug 18, 2022', 'This is a nice place.')
 ''')
 cursor.execute('''
-    INSERT INTO ratings_and_reviews(place_id,date,ratingStars,comment)VALUES(11,'Thu, Aug 18, 2022', 3,'This is a nice hotel.')
+    INSERT INTO ratings_and_reviews(place_id,date,comment)VALUES(11,'Thu, Aug 18, 2022', 'This is a nice hotel.')
 ''')
 cursor.execute('''
-    INSERT INTO ratings_and_reviews(place_id,date,ratingStars,comment)VALUES(12,'Thu, Aug 18, 2022', 3,'This is a nice hotel.')
+    INSERT INTO ratings_and_reviews(place_id,date,comment)VALUES(12,'Thu, Aug 18, 2022', 'This is a nice hotel.')
 ''')
 cursor.execute('''
-    INSERT INTO ratings_and_reviews(place_id,date,ratingStars,comment)VALUES(17,'Thu, Aug 18, 2022', 3,'This is a nice food.')
+    INSERT INTO ratings_and_reviews(place_id,date,comment)VALUES(17,'Thu, Aug 18, 2022', 'This is a nice food.')
 ''')
 cursor.execute('''
-    INSERT INTO ratings_and_reviews(place_id,date,ratingStars,comment)VALUES(18,'Thu, Aug 18, 2022', 3,'This is a nice food.')
+    INSERT INTO ratings_and_reviews(place_id,date,comment)VALUES(18,'Thu, Aug 18, 2022', 'This is a nice food.')
 ''')
 cursor.execute('''
-    INSERT INTO ratings_and_reviews(place_id,date,ratingStars,comment)VALUES(19,'Thu, Aug 18, 2022', 3,'This is a nice food.')
+    INSERT INTO ratings_and_reviews(place_id,date,comment)VALUES(19,'Thu, Aug 18, 2022', 'This is a nice food.')
 ''')
 
 db.commit()

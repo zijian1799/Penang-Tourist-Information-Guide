@@ -45,13 +45,6 @@ export default class ReviewScreen extends Component {
       <View style={styles.container}>
         <Image source={{uri: this.state.place.image}} style={styles.imageStyle} />
         <Text style={styles.nameStyle}>{this.state.place.name}</Text>
-        <View style={styles.aboutContainer}>
-          <Text style={styles.aboutStyle}>Location: {this.state.place.location}</Text>
-          <Text style={styles.aboutStyle}>Operating Hours: {this.state.place.operatinghours}</Text>
-          <Text style={styles.aboutStyle}>Price Range: {this.state.place.priceRange}</Text>
-          <Text style={styles.aboutStyle}>Website: {this.state.place.website}</Text>
-          <Text style={styles.aboutStyle}>Contact: {this.state.place.contact}</Text>
-        </View>
       </View>
     );
   }
