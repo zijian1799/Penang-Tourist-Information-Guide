@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TextInput } from 'react-native-gesture-handler';
-import {Alert, Button, StyleSheet, View, Text} from 'react-native';
+import {Alert, Button, StyleSheet, View, Text, TouchableOpacity} from 'react-native';
 let config = require('../Config');
 
 export default class LoginScreen extends Component {  
@@ -11,16 +11,15 @@ export default class LoginScreen extends Component {
     this.state = {
       username:'',      
       password:'',
-      user:[],      
-      isFetching: false,
+      user:[],     
     };    
   }
 
   componentDidMount(){
-    this.validateUser();
+    this._validateUser();
   }
 
-  validateUser = () =>{
+  async _validateUser(){
     try{
       AsyncStorage.getItem('UserData')
         .then(value =>{
@@ -33,7 +32,7 @@ export default class LoginScreen extends Component {
     }
   }
 
-  saveUser = async (user) => {
+  async _saveUser(user){
     try{
       var User = {
         username: user.name,
@@ -46,8 +45,7 @@ export default class LoginScreen extends Component {
   }
 
   _login(){
-    let url = config.settings.serverPath + '/api/login';
-    this.setState({isFetching: true});
+    let url = config.settings.serverPath + '/api/login';    
     
     fetch(url, {
       method: 'POST',
@@ -63,17 +61,15 @@ export default class LoginScreen extends Component {
       .then(response => {
         if (!response.ok){
           Alert.alert('Error:', 'Wrong username and password combination');                   
-        }
-        this.setState({isFetching: false});
+        }        
         return response.json();
       })
       .then(data => {   
         if (data != null){
           this.setState({user: data});
-
+          this._saveUser(this.state.user);
           this.props.navigation.navigate('content');
-        }   
-        this.setState({user: data}); 
+        }           
       })
       .catch(error => {
         console.error("There was an error", error);
@@ -92,35 +88,61 @@ export default class LoginScreen extends Component {
     };
 
     return(
-      <View>
-        <Text>Login</Text>        
-        <TextInput 
-          style = {styles.input} 
-          placeholder = {"Username:"} 
-          onChangeText = {username => this.setState({username})}
-        />
-        <TextInput 
-          style = {styles.input} 
-          placeholder = {"Password:"}
-          keyboardType = {'default'} 
-          secureTextEntry 
-          onChangeText = {password => this.setState({password})}
-        />
-        <Button
-          title= "Log In"
-          onPress={pressHandler} />
-      </View>
-        
+      <View style={styles.container}>
+        <Text style = {styles.title}>Login</Text>
+        <View style={styles.inputView}>       
+          <TextInput 
+            style = {styles.inputText} 
+            placeholder = {"Username:"} 
+            onChangeText = {username => this.setState({username})}
+          />
+        </View>
+        <View style={styles.inputView}>   
+          <TextInput 
+            style = {styles.inputText} 
+            placeholder = {"Password:"}
+            secureTextEntry 
+            onChangeText = {password => this.setState({password})}
+          />
+        </View>
+          <Button
+            title= "Log In"
+            onPress={pressHandler} />
+          <TouchableOpacity onPress = {() => this.props.navigation.navigate('signup')}>
+            <Text style={styles.signup}>Do not have an ID? Let's sign up.</Text>            
+          </TouchableOpacity>
+      </View>        
     );
   }
 }
 
 const styles = StyleSheet.create({
-  input:{
-    width: 200,
-    padding: 20,
-    borderRadius: 30,
+  container:{
+    flex: 1,
+    backgroundColor: 'lightblue',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  title:{
+    fontSize: 30,
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  inputView:{
+    width: "80%",
+    backgroundColor: 'white',
+    borderRadius: 25,
+    height: 50,
+    marginBottom: 30,
+    justifyContent: 'center',
+    padding:20,    
+  },
+  inputText:{
+    height:50,
+  },
+  signup:{
+    color: '#3399FF',
+    paddingTop: 20,
+    fontSize: 20,
   }
-
-
 })

@@ -22,12 +22,12 @@ def places_get_row_as_dict(row):
 
     return row_dict
 
-
 def user_get_row_as_dict(row):
     row_dict = {
         'user_id': row[0],
-        'name': row[1],        
-        'password': row[4],
+        'name': row[1],
+        'email': row[2],        
+        'password': row[3],
     }
 
     return row_dict
@@ -108,6 +108,31 @@ def get_user():
             return jsonify(row_as_dict), 200
     else:  
         return jsonify(None), 200    
+
+@app.route('/api/register', methods=['POST'])
+def create_user():
+    new_user = (
+        request.json['username'],
+        request.json['email'],
+        request.json['password'],
+    )
+            
+    db = sqlite3.connect(DB)
+    cursor = db.cursor()  
+    cursor.execute('''INSERT INTO users(name,email,password)VALUES(?,?,?)''',new_user)
+
+    user_id = cursor.lastrowid 
+
+    db.commit()
+    
+    response = {
+        'id': user_id,
+        'affected': db.total_changes,
+    }
+
+    db.close()
+
+    return jsonify(response),201
 
 @app.route('/api/places/<int:id>', methods=['GET'])
 def show(id):
