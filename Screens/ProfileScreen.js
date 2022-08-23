@@ -23,14 +23,12 @@ export default class ProfileScreen extends Component {
 
   async _readUser(){
     try {
-      let userDetail = await AsyncStorage.getItem('UserDetail'); 
-           
-      if (userDetail !== null){
-        console.log(userDetail)              
-        this.setState({user: userDetail});
-        console.log(this.state.user)
-        this.setState({username: this.state.user['username']})    
-        console.log(this.state.username)
+      let username = await AsyncStorage.getItem('Username'); 
+      let email = await AsyncStorage.getItem('Email');
+      
+      if (username !== null){                     
+        this.setState({username: username});        
+        this.setState({email: email});            
       }
     }catch (error){
       console.log('Error loading user details.', error)
@@ -43,7 +41,7 @@ export default class ProfileScreen extends Component {
           <Image style={styles.avatar} source={{uri: 'https://www.pngkey.com/png/detail/202-2024792_user-profile-icon-png-download-fa-user-circle.png'}}/>
           <View style={styles.body}>
             <Text style={styles.name}>{this.state.username}</Text>
-            <Text style={styles.email}>{this.state.email}</Text>            
+            <Text style={styles.email}>Email: {this.state.email}</Text>            
         </View>
       </View>
     );
@@ -67,15 +65,18 @@ const styles = StyleSheet.create({
     marginTop:130
   },
   body:{
-    marginTop:40,
+    marginTop:90,
+    alignSelf: 'center',
   },
   name:{
-    fontSize:60,
+    fontSize:40,
     color: "black",
-    fontWeight: "600"
+    fontWeight: "600",
+    fontFamily: "",
+    textAlign: 'center',    
   },
   email:{
-    fontSize:16,
+    fontSize:20,
     color: "#696969",
     marginTop:10,
     textAlign: 'center'
