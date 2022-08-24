@@ -1,7 +1,16 @@
 import React, {Component} from 'react';
-import {View, Text, StyleSheet, Image, Alert, Button} from 'react-native';
-
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  Alert,
+  Button,
+  Dimensions,
+  TouchableOpacity,
+} from 'react-native';
 let config = require('../Config');
+const win = Dimensions.get('window').width;
 
 export default class DetailsScreen extends Component {
   constructor(props) {
@@ -22,7 +31,7 @@ export default class DetailsScreen extends Component {
     this.setState({isFetching: true});
     fetch(url)
       .then(response => {
-        if(!response.ok) {
+        if (!response.ok) {
           Alert.alert('Error: ', response.status.toString());
           throw Error('Error ' + response.status);
         }
@@ -43,14 +52,77 @@ export default class DetailsScreen extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <Image source={{uri: this.state.place.image}} style = {styles.imageStyle} />
-        <Text style={styles.nameStyle}>{this.state.place.name}</Text>
-        <View style={styles.descriptionContainer}>
+        <View style={{flex: 0.4}}>
+          <Image
+            source={{uri: this.state.place.image}}
+            style={{
+              width: Dimensions.get('window').width,
+              height: Dimensions.get('window').height / 3,
+              // height: '100%',
+            }}></Image>
+          <Text style={styles.nameStyle}>{this.state.place.name}</Text>
+        </View>
+        <View style={{flex: 0.6}}>
           <View style={styles.buttonContainer}>
-            <Button style={styles.button} title="About" onPress={() => {this.props.navigation.navigate('About', {id: this.state.id});}} />
-            <Button style={styles.button} title="Reviews" onPress={() => {this.props.navigation.navigate('Reviews', {id: this.state.id});}} />
+            <TouchableOpacity
+              opacity="0.8"
+              style={(styles.buttonNav_active, styles.buttonNav)}
+              onPress={() => {
+                this.props.navigation.navigate('Description', {
+                  id: this.state.id,
+                });
+              }}>
+              <View style={styles.innerText}>
+                <Text
+                  style={{
+                    fontSize: 18,
+                    color: 'yellow',
+                    fontWeight: 'bold',
+                  }}>
+                  Description
+                </Text>
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.buttonNav}
+              onPress={() => {
+                this.props.navigation.navigate('About', {id: this.state.id});
+              }}>
+              <View style={styles.innerText}>
+                <Text
+                  style={{
+                    fontSize: 18,
+                    color: 'white',
+                    fontWeight: 'bold',
+                  }}>
+                  About
+                </Text>
+              </View>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.buttonNav}
+              onPress={() => {
+                this.props.navigation.navigate('Reviews', {
+                  id: this.state.id,
+                });
+              }}>
+              <View style={styles.innerText}>
+                <Text
+                  style={{
+                    fontSize: 18,
+                    color: 'white',
+                    fontWeight: 'bold',
+                  }}>
+                  Reviews
+                </Text>
+              </View>
+            </TouchableOpacity>
           </View>
-          <Text style={styles.descriptionStyle}>{this.state.place.description}</Text>
+
+          <Text style={styles.descriptionStyle}>
+            {this.state.place.description}
+          </Text>
         </View>
       </View>
     );
@@ -65,18 +137,19 @@ const styles = StyleSheet.create({
   },
 
   buttonContainer: {
-    justifyContent: 'space-between',
+    justifyContent: 'center',
+    flexDirection: 'row',
+    marginTop: -10,
   },
-
   descriptionStyle: {
     color: 'black',
-    fontSize: 25,
-    textAlign: 'center',
-    fontFamily: 'Roboto'
+    fontSize: 20,
+    margin: 20,
+    fontFamily: 'Roboto',
   },
 
   button: {
-    width: 100
+    width: 100,
   },
 
   imageStyle: {
@@ -87,7 +160,30 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 20,
     fontSize: 25,
-    fontFamily: 'monospace',
+    fontFamily: 'roboto',
+    marginLeft: '5%',
+    fontWeight: 'bold',
     color: 'white',
-  }
+  },
+  buttonNav: {
+    width: '28%',
+    backgroundColor: '#05445E',
+    borderRadius: 10,
+    marginTop: 5,
+    marginHorizontal: 5,
+    paddingHorizontal: 5,
+    paddingVertical: 10,
+    textAlign: 'center',
+    shadowColor: '#303838',
+    shadowOffset: {width: 0, height: 5},
+    shadowRadius: 10,
+    // shadowOpacity: 0.8,
+  },
+  buttonNav_active: {
+    // opacity: 0.8,
+  },
+  innerText: {
+    color: 'white',
+    alignItems: 'center',
+  },
 });
