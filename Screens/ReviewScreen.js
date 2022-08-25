@@ -53,6 +53,7 @@ export default class ReviewScreen extends Component {
   }
 
   componentDidMount() {
+    // this.setState({isCommented: false});
     this._readUser();
     this._loadPlaces();
     this._loadReviews();
@@ -60,28 +61,29 @@ export default class ReviewScreen extends Component {
   _loadReviews() {
     let url = config.settings.serverPath + '/api/reviews/' + this.state.id;
     this.setState({isFetchingReviews: true});
+    this.setState({isCommented: false});
+
     fetch(url)
       .then(response => {
         if (!response.ok) {
           Alert.alert('Error: ', response.status.toString());
           throw Error('Error ' + response.status);
         }
+        this.setState({isCommented: false});
         this.setState({isFetchingReviews: false});
         return response.json();
       })
 
       .then(reviews => {
         for (let i = 0; i < reviews.length; i++) {
-          console.log('Getstate: ' + this.state.user_id);
-          console.log('Get review user_id: ' + reviews[i].user_user_id);
-
+          // console.log('Getstate: ' + this.state.user_id);
+          // console.log('Get review user_id: ' + reviews[i].user_user_id);
+          this.setState({isCommented: false});
           if (reviews[i].user_user_id == this.state.user_id) {
             console.log('Get: ' + reviews[i].user_user_id);
             this.setState({isCommented: true});
             this.setState({review: reviews[i]});
             this.setState({user_review_id: reviews[i].reviews_id});
-            console.log('Commented? ' + this.state.isCommented);
-            console.log('user_review_id: ' + this.state.user_review_id);
           }
         }
         console.log(reviews);
@@ -106,7 +108,6 @@ export default class ReviewScreen extends Component {
       })
 
       .then(place => {
-        // console.log(place);
         this.setState({place: place});
       })
 

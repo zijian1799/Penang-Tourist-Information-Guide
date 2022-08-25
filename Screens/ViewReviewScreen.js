@@ -67,7 +67,7 @@ export default class ViewReviewScreen extends Component {
         text: 'Yes',
         onPress: () => {
           let url =
-            config.settings.serverPath + '/api/members/' + this.state.id;
+            config.settings.serverPath + '/api/reviews/' + this.state.id;
           console.log(url);
           fetch(url, {
             method: 'DELETE',
@@ -103,42 +103,7 @@ export default class ViewReviewScreen extends Component {
     let review = this.state.review;
     console.log(review);
     if (review) {
-      return (
-        <ScrollView style={{flex: 1, margin: 10}}>
-          <InputWithLabel
-            textInputStyle={styles.input}
-            textLabelStyle={styles.label}
-            editable={false}
-            label="Name:">
-            {member.name ? member.name : 'No information'}
-          </InputWithLabel>
-          <InputWithLabel
-            textInputStyle={styles.input}
-            textLabelStyle={styles.label}
-            editable={false}
-            label="Email:">
-            {member.email ? member.email : 'No information'}
-          </InputWithLabel>
-
-          <FloatingAction
-            actions={actions}
-            color="#cd5c5c"
-            onPressItem={name => {
-              switch (name) {
-                case 'edit':
-                  this.props.navigation.navigate('Edit', {
-                    id: member.id,
-                    _refresh: this._loadByID,
-                    homeRefresh: this.props.route.params._refresh,
-                  });
-                  break;
-                case 'delete':
-                  this._delete();
-                  break;
-              }
-            }}></FloatingAction>
-        </ScrollView>
-      );
+      return <ScrollView style={{flex: 1, margin: 10}}></ScrollView>;
     }
   }
 }

@@ -61,7 +61,7 @@ export default class CreateReviewScreen extends Component<Props> {
       place_id: this.props.route.params.place_id,
       place_name: this.props.route.params.place_name,
       user_id: this.props.route.params.user_id,
-      reviews_id: this.props.route.params.user_review_id,
+      reviews_id: parseInt(this.props.route.params.user_review_id),
       date: '',
       ratingStars: 0,
       comment: '',
@@ -78,7 +78,7 @@ export default class CreateReviewScreen extends Component<Props> {
   componentDidMount() {
     this._readUser();
     this._loadReviewByID();
-    // this.props.navigation.setOptions({headerTitle: 'Edit Review'});
+    this.props.navigation.setOptions({headerTitle: 'Edit Review'});
   }
 
   _loadReviewByID() {
@@ -99,7 +99,6 @@ export default class CreateReviewScreen extends Component<Props> {
         console.log(review);
         this.setState({ratingStars: review.ratingStars});
         this.setState({comment: review.comment});
-
         this.setState({review: review});
       })
 
@@ -113,15 +112,11 @@ export default class CreateReviewScreen extends Component<Props> {
       let username = await AsyncStorage.getItem('Username');
       let email = await AsyncStorage.getItem('Email');
       let user_id = await AsyncStorage.getItem('user_id');
-      //   console.log(user_id);
 
       if (user_id !== null) {
         this.setState({user_id: parseInt(user_id)});
         this.setState({username: username});
         this.setState({email: email});
-        // console.log(this.state.user_id);
-        console.log(this.state.username);
-        console.log(this.state.user_id);
       }
     } catch (error) {
       console.log('Error loading user details.', error);
@@ -170,7 +165,7 @@ export default class CreateReviewScreen extends Component<Props> {
   }
 
   _delete() {
-    Alert.alert('Confirm to DELETE', this.state.reviews_id, [
+    Alert.alert('Confirm to DELETE review for ', this.state.place_name + '?', [
       {
         text: 'No',
         onPress: () => {},
@@ -179,7 +174,9 @@ export default class CreateReviewScreen extends Component<Props> {
         text: 'Yes',
         onPress: () => {
           let url =
-            config.settings.serverPath + '/api/user_reviews/' + this.state.id;
+            config.settings.serverPath +
+            '/api/user_reviews/' +
+            this.state.reviews_id;
           console.log(url);
           fetch(url, {
             method: 'DELETE',
@@ -214,19 +211,6 @@ export default class CreateReviewScreen extends Component<Props> {
   render() {
     return (
       <View style={{flex: 1}}>
-        {/* <View style={{backgroundColor: 'navy'}}>
-          <Text
-            style={{
-              height: 50,
-              textAlign: 'center',
-              fontWeight: 'bold',
-              fontSize: 30,
-              color: 'white',
-            }}>
-            Edit Review
-          </Text>
-        </View> */}
-
         <View style={{marginTop: '25%', justifyContent: 'center', padding: 10}}>
           <Text
             style={{

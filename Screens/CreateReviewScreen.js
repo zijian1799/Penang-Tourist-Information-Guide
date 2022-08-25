@@ -61,7 +61,7 @@ export default class CreateReviewScreen extends Component<Props> {
   }
   componentDidMount() {
     this._readUser();
-    // this.props.navigation.setOptions({headerTitle: 'Add Review'});
+    this.props.navigation.setOptions({headerTitle: 'Add Review'});
   }
   async _readUser() {
     try {
@@ -123,22 +123,6 @@ export default class CreateReviewScreen extends Component<Props> {
   render() {
     return (
       <ScrollView style={{flex: 1}}>
-        {/* <Text>{this.state.place_id}</Text>
-        <Text>{this.state.user_id}</Text>
-        <Text>{this.state.date.formatted()}</Text> */}
-        <View style={{backgroundColor: 'navy'}}>
-          <Text
-            style={{
-              height: 50,
-              textAlign: 'center',
-              fontWeight: 'bold',
-              fontSize: 30,
-              color: 'white',
-            }}>
-            Add Review
-          </Text>
-        </View>
-
         <View style={{marginTop: '25%', justifyContent: 'center', padding: 10}}>
           <Text
             style={{
