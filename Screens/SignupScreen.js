@@ -22,29 +22,7 @@ export default class SignupScreen extends Component {
       retypePassword: '',      
     }
   }
-  async _saveUser(){
-    try {
-      var User = {
-        username: this.state.username,
-        email: this.state.email,
-        password: this.state.password
-      }
-      await AsyncStorage.setItem('UserDetail', JSON.stringify(User));
-    }catch (error){
-      console.log(error)
-    }
-  }
-  async _saveUser(){
-    try{
-      let username = this.state.username
-      let email = this.state.email
-          
-      await AsyncStorage.setItem('Username', username);
-      await AsyncStorage.setItem('Email', email);
-    } catch (error){
-      console.log(error)
-    }
-  }
+
   _register(){
     let url = config.settings.serverPath + '/api/register';    
     
@@ -69,9 +47,8 @@ export default class SignupScreen extends Component {
       })
       .then(data => {   
         if (data.affected > 0){
-          Alert.alert('Successfully registered.')
-          this._saveUser();
-          this.props.navigation.navigate('content');        
+          Alert.alert('Successfully registered.')          
+          this.props.navigation.navigate('login');        
         }   
       })
       .catch(error => {
