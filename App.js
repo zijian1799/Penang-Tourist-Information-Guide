@@ -3,8 +3,8 @@ import React, {Component} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 
 import {createStackNavigator} from '@react-navigation/stack';
-import WelcomeScreen from './WelcomeScreen';
-import ContentScreen from './ContentScreen';
+import WelcomeScreen from './Screens/WelcomeScreen';
+import ContentScreen from './Screens/ContentScreen';
 import LoginScreen from './Screens/LoginScreen';
 import SignupScreen from './Screens/SignupScreen';
 

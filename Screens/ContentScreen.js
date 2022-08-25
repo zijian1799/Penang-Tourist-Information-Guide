@@ -26,11 +26,6 @@ export default class ContentScreen extends Component {
           tabBarActiveTintColor: 'black',
         }}>
         <Tab.Screen
-          name="Profile"
-          component={ProfileScreen}
-          options={styles.profileOptions}
-        />
-        <Tab.Screen
           name="Home"
           component={HomeNavigator}
           options={styles.homeOptions}></Tab.Screen>
@@ -39,6 +34,11 @@ export default class ContentScreen extends Component {
           component={NavScreen}
           options={styles.navOptions}
         /> */}
+        <Tab.Screen
+          name="Profile"
+          component={ProfileScreen}
+          options={styles.profileOptions}
+        />
         <Tab.Screen
           name="Favourite"
           component={FavScreen}

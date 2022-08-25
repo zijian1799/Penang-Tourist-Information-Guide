@@ -180,7 +180,7 @@ def delete_review(id):
 
     return jsonify(response), 200
 
-@app.route('api/ratings_and_reviews/', methods=['POST'])
+@app.route('/api/ratings_and_reviews/', methods=['POST'])
 def create_review():
     new_comment = (
         request.json['place_id'],

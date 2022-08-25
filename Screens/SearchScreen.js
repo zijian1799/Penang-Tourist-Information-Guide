@@ -10,7 +10,13 @@ export default class SearchScreen extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <Text>Search Screen</Text>
+        {/* search bar, allow input, search icon */}
+        {/* when click search icon or click enter, execute search query */}
+        <ScrollView style={styles.content}>
+          {/* foreach here */}
+          {/* search response template */}
+          {/* when user click on name, bring user to corresponding page/screen */}
+        </ScrollView>
       </View>
     );
   }

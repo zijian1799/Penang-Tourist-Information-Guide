@@ -10,7 +10,12 @@ export default class FavouriteScreen extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <Text>Favourite Screen</Text>
+        <Text style={styles.header}>My Favourite Places</Text>
+        <ScrollView style={styles.content}>
+          {/* foreach here */}
+          {/* favourite places template */}
+          
+        </ScrollView>
       </View>
     );
   }
@@ -21,5 +26,11 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'flex-start',
     backgroundColor: 'lightblue',
+  },
+  header:{
+    
+  },
+  content: {
+
   },
 });
