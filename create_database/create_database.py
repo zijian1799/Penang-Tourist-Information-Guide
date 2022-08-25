@@ -32,7 +32,7 @@ db.execute('''CREATE TABLE ratings_and_reviews(
     place_id integer NOT NULL,
     user_id integer NOT NULL,
     date text NOT NULL,
-    ratingStars text NOT NULL,
+    ratingStars integer NOT NULL,
     comment text NOT NULL,
     FOREIGN KEY(place_id) REFERENCES places(place_id),
     FOREIGN KEY(user_id) REFERENCES users(user_id)
