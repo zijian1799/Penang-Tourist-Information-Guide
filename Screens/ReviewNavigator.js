@@ -25,9 +25,11 @@ export default class ReviewNavigator extends Component {
     return (
       <stack.Navigator
         initialRouteName="Review"
-        screenOptions={{
-          headerShown: false,
-        }}>
+        screenOptions={
+          {
+            // headerShown: false,
+          }
+        }>
         <stack.Screen
           name="Review"
           component={ReviewScreen}

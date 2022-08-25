@@ -46,12 +46,13 @@ def reviews_get_row_as_dict(row):
 
 def reviews_users_get_row_as_dict(row):
     row_dict = {
-        'review_user_id': row[0],
-        'date': row[1],
-        'ratingStars': row[2],
-        'comment': row[3],
-        'user_user_id': row[4],
-        'name':row[5],
+        'reviews_id':row[0],
+        'review_user_id': row[1],
+        'date': row[2],
+        'ratingStars': row[3],
+        'comment': row[4],
+        'user_user_id': row[5],
+        'name':row[6],
     }
 
     return row_dict
@@ -166,7 +167,7 @@ def show(id):
 def show_review(place_id):
     db = sqlite3.connect(DB)
     cursor = db.cursor()
-    cursor.execute('SELECT ratings_and_reviews.user_id,ratings_and_reviews.date,ratings_and_reviews.ratingStars,ratings_and_reviews.comment,users.user_id,users.name FROM ratings_and_reviews JOIN users ON ratings_and_reviews.user_id = users.user_id WHERE ratings_and_reviews.place_id=?', (int(place_id),))
+    cursor.execute('SELECT ratings_and_reviews.reviews_id,ratings_and_reviews.user_id,ratings_and_reviews.date,ratings_and_reviews.ratingStars,ratings_and_reviews.comment,users.user_id,users.name FROM ratings_and_reviews JOIN users ON ratings_and_reviews.user_id = users.user_id WHERE ratings_and_reviews.place_id=?', (int(place_id),))
     rows = cursor.fetchall()
     print('test')
     print(rows)
@@ -228,24 +229,86 @@ def store_review():
 
     return jsonify(response), 201
 
-@app.route('/api/userreview/<int:user_id>', methods=['GET'])
-def show_specific_review(user_id):
+@app.route('/api/reviews/<int:review>', methods=['PUT'])
+def update_review(review):
+    if not request.json:
+        abort(400)
+
+    if 'reviews_id' not in request.json:
+        abort(400)
+
+    if int(request.json['reviews_id']) != review:
+        abort(400)
+
+    update_review = (
+        request.json['place_id'],
+        request.json['user_id'],
+        request.json['date'],
+        request.json['ratingStars'],
+        request.json['comment'],
+        str(review),
+    )
+
     db = sqlite3.connect(DB)
     cursor = db.cursor()
 
-    cursor.execute('SELECT ratings_and_reviews.user_id,ratings_and_reviews.date,ratings_and_reviews.ratingStars,ratings_and_reviews.comment,users.user_id,users.name FROM ratings_and_reviews JOIN users ON ratings_and_reviews.user_id = users.user_id WHERE ratings_and_reviews.user_id=?',(int(user_id),))
-    row = cursor.fetchone()
-    print('test')
-    # print(rows)
+    cursor.execute('''
+        UPDATE ratings_and_reviews SET
+            place_id=?,user_id=?,date=?,ratingStars=?,comment=?
+        WHERE reviews_id=?
+    ''', update_review)
+
+    db.commit()
+
+    response = {
+        'reviews_id': review,
+        'affected': db.total_changes,
+    }
 
     db.close()
 
-    # rows_as_dict = []
+    return jsonify(response), 201
+
+@app.route('/api/user_reviews/<int:reviews_id>', methods=['GET'])
+def show_user_reviews(reviews_id):
+    db = sqlite3.connect(DB)
+    cursor = db.cursor()
+    cursor.execute('SELECT * FROM ratings_and_reviews WHERE reviews_id=?', (int(reviews_id),))
+    row = cursor.fetchone()
+    db.close()
+
     if row:
-        row_as_dict = reviews_users_get_row_as_dict(row)
+        row_as_dict = reviews_get_row_as_dict(row)
         return jsonify(row_as_dict), 200
     else:
         return jsonify(None), 200
+
+@app.route('/api/user_reviews/<int:review>', methods=['DELETE'])
+def delete_review(review):
+    if not request.json:
+        abort(400)
+
+    if 'reviews_id' not in request.json:
+        abort(400)
+
+    if int(request.json['reviews_id']) != review:
+        abort(400)
+
+    db = sqlite3.connect(DB)
+    cursor = db.cursor()
+
+    cursor.execute('DELETE FROM ratings_and_reviews WHERE reviews_id=?', (str(review),))
+
+    db.commit()
+
+    response = {
+        'reviews_id': review,
+        'affected': db.total_changes,
+    }
+
+    db.close()
+
+    return jsonify(response), 201
 
 
 if __name__ == '__main__':

@@ -181,8 +181,6 @@ export default class CreateReviewScreen extends Component<Props> {
             }}
             orientation={'vertical'}
           />
-          <Text>{this.state.comment} </Text>
-
           <AppButton title={'Add'} onPress={this._save}></AppButton>
         </View>
       </ScrollView>

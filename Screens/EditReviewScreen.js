@@ -44,6 +44,16 @@ Date.prototype.formatted = function () {
   return `${daysText[day]}, ${monthsText[month]} ${date}, ${year}`;
 };
 
+const action = [
+  {
+    text: 'Delete',
+    icon: require('../Assets/icons/delete_icon.jpg'),
+    name: 'delete',
+    position: 1,
+    color: '#cd5c5c',
+  },
+];
+
 export default class CreateReviewScreen extends Component<Props> {
   constructor(props) {
     super(props);
@@ -51,58 +61,53 @@ export default class CreateReviewScreen extends Component<Props> {
       place_id: this.props.route.params.place_id,
       place_name: this.props.route.params.place_name,
       user_id: this.props.route.params.user_id,
+      reviews_id: this.props.route.params.user_review_id,
       date: '',
       ratingStars: 0,
       comment: '',
       date: new Date(Date.now()),
       review: [],
-      isFetchingReviews: false,
+      isFetchingReview: false,
     };
-    this._save = this._save.bind(this);
     this._readUser = this._readUser.bind(this);
-    this._loadReview = this._loadReview.bind(this);
+    this._loadReviewByID = this._loadReviewByID.bind(this);
+    this._edit = this._edit.bind(this);
+    this._delete = this._delete.bind(this);
   }
-  _loadReview() {
-    // this._readUser();
-    console.log('id: ' + this.state.user_id);
 
+  componentDidMount() {
+    this._readUser();
+    this._loadReviewByID();
+    // this.props.navigation.setOptions({headerTitle: 'Edit Review'});
+  }
+
+  _loadReviewByID() {
     let url =
-      config.settings.serverPath +
-      '/api/reviews/' +
-      this.state.place_id +
-      '/' +
-      this.state.user_id;
-    this.setState({isFetchingReviews: true});
-
+      config.settings.serverPath + '/api/user_reviews/' + this.state.reviews_id;
+    this.setState({isFetchingReview: true});
     fetch(url)
       .then(response => {
         if (!response.ok) {
           Alert.alert('Error: ', response.status.toString());
           throw Error('Error ' + response.status);
         }
-        this.setState({isFetchingReviews: false});
+        this.setState({isFetchingReview: false});
         return response.json();
       })
 
       .then(review => {
-        console.log('==============================');
-        console.log('This is response: ' + review.comment);
-        // this.setState({ratingStars: review.ratingStars});
-        // this.setState({comment: review.comment});
+        console.log(review);
+        this.setState({ratingStars: review.ratingStars});
+        this.setState({comment: review.comment});
 
-        // this.setState({user_id: parseInt(reviews[0].user_id)});
-        // console.log(reviews[0].user_id);
+        this.setState({review: review});
       })
 
       .catch(error => {
         console.error(error);
       });
   }
-  componentDidMount() {
-    this._readUser();
-    this._loadReview();
-    // this.props.navigation.setOptions({headerTitle: 'Edit Review'});
-  }
+
   async _readUser() {
     try {
       let username = await AsyncStorage.getItem('Username');
@@ -122,18 +127,20 @@ export default class CreateReviewScreen extends Component<Props> {
       console.log('Error loading user details.', error);
     }
   }
-  _save() {
-    let url = config.settings.serverPath + '/api/reviews';
+  _edit() {
+    let url =
+      config.settings.serverPath + '/api/reviews/' + this.state.reviews_id;
 
     fetch(url, {
-      method: 'POST',
+      method: 'PUT',
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        place_id: this.state.place_id,
+        reviews_id: this.state.reviews_id,
         user_id: this.state.user_id,
+        place_id: this.state.place_id,
         date: this.state.date.formatted(),
         ratingStars: this.state.ratingStars,
         comment: this.state.comment,
@@ -150,9 +157,9 @@ export default class CreateReviewScreen extends Component<Props> {
       })
       .then(respondJson => {
         if (respondJson.affected > 0) {
-          Alert.alert('Record SAVED for', this.state.name);
+          Alert.alert('Review UPDATED.');
         } else {
-          Alert.alert('Error in SAVING');
+          Alert.alert('Error in UPDATING');
         }
         this.props.route.params._refresh();
         this.props.navigation.goBack();
@@ -162,24 +169,52 @@ export default class CreateReviewScreen extends Component<Props> {
       });
   }
 
-  openTimePicker() {
-    this.setState({openPicker: true});
+  _delete() {
+    Alert.alert('Confirm to DELETE', this.state.reviews_id, [
+      {
+        text: 'No',
+        onPress: () => {},
+      },
+      {
+        text: 'Yes',
+        onPress: () => {
+          let url =
+            config.settings.serverPath + '/api/user_reviews/' + this.state.id;
+          console.log(url);
+          fetch(url, {
+            method: 'DELETE',
+            headers: {
+              Accept: 'application/json',
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({reviews_id: this.state.reviews_id}),
+          })
+            .then(response => {
+              if (!response.ok) {
+                Alert.alert('Error:', response.status.toString());
+                throw Error('Error ' + response.status);
+              }
+              return response.json();
+            })
+            .then(responseJson => {
+              if (responseJson.affected == 0) {
+                Alert.alert('Error in DELETING');
+              }
+            })
+            .catch(error => {
+              console.error(error);
+            });
+          this.props.route.params._refresh();
+          this.props.navigation.goBack();
+        },
+      },
+    ]);
   }
-  onDateSelected(event, value) {
-    this.setState({
-      date: value,
-      openPicker: false,
-    });
-  }
+
   render() {
     return (
-      <ScrollView style={{flex: 1}}>
-        <Text>{this.state.place_id}</Text>
-        <Text>{this.state.user_id}</Text>
-        <Text>{this.state.date.formatted()}</Text>
-        <Text>{this.state.ratingStars}</Text>
-        <Text>{this.state.comment}</Text>
-        <View style={{backgroundColor: 'navy'}}>
+      <View style={{flex: 1}}>
+        {/* <View style={{backgroundColor: 'navy'}}>
           <Text
             style={{
               height: 50,
@@ -188,9 +223,9 @@ export default class CreateReviewScreen extends Component<Props> {
               fontSize: 30,
               color: 'white',
             }}>
-            Add Review
+            Edit Review
           </Text>
-        </View>
+        </View> */}
 
         <View style={{marginTop: '25%', justifyContent: 'center', padding: 10}}>
           <Text
@@ -211,7 +246,7 @@ export default class CreateReviewScreen extends Component<Props> {
               step={1}
               minimumValue={1}
               maximumValue={5}
-              value={this.state.ratingStars}
+              value={this.state.review.ratingStars}
               onValueChange={ratingStars => this.setState({ratingStars})}
             />
             <View style={{flexDirection: 'row'}}>
@@ -234,11 +269,21 @@ export default class CreateReviewScreen extends Component<Props> {
             }}
             orientation={'vertical'}
           />
-          <Text>{this.state.comment} </Text>
 
-          {/* <AppButton title={'Add'} onPress={this._save}></AppButton> */}
+          <AppButton title={'Save'} onPress={this._edit}></AppButton>
         </View>
-      </ScrollView>
+        <FloatingAction
+          actions={action}
+          color="#cd5c5c"
+          onPressItem={name => {
+            switch (name) {
+              case 'delete':
+                this._delete();
+                console.log('Delete clicked');
+                break;
+            }
+          }}></FloatingAction>
+      </View>
     );
   }
 }

@@ -22,13 +22,13 @@ const action = [
     position: 1,
     color: '#cd5c5c',
   },
-  // {
-  //   text: 'Edit',
-  //   icon: require('../Assets/icons/edit_icon.png'),
-  //   name: 'edit',
-  //   position: 2,
-  //   color: '#cd5c5c',
-  // },
+  {
+    text: 'Edit',
+    icon: require('../Assets/icons/edit_icon.png'),
+    name: 'edit',
+    position: 2,
+    color: '#cd5c5c',
+  },
 ];
 
 export default class ReviewScreen extends Component {
@@ -40,47 +40,22 @@ export default class ReviewScreen extends Component {
       place: [],
       reviews: [],
       review: [],
+      user_review_id: 0,
+      isCommented: false,
       isFetchingReviews: false,
       isFetchingPlaces: false,
       isFetchingReview_byuser: false,
     };
     this._loadPlaces = this._loadPlaces.bind(this);
     this._loadReviews = this._loadReviews.bind(this);
-    this._loadReviewsByuser_id = this._loadReviewsByuser_id.bind(this);
 
     this._readUser = this._readUser.bind(this);
   }
 
   componentDidMount() {
+    this._readUser();
     this._loadPlaces();
     this._loadReviews();
-    this._readUser();
-    // this._loadReviewsByuser_id();
-  }
-
-  _loadReviews() {
-    let url = config.settings.serverPath + '/api/reviews/' + this.state.id;
-    this.setState({isFetchingReviews: true});
-    fetch(url)
-      .then(response => {
-        if (!response.ok) {
-          Alert.alert('Error: ', response.status.toString());
-          throw Error('Error ' + response.status);
-        }
-        this.setState({isFetchingReviews: false});
-        return response.json();
-      })
-
-      .then(reviews => {
-        console.log(reviews);
-        this.setState({reviews: reviews});
-        // this.setState({user_id: parseInt(reviews[0].user_id)});
-        // console.log(reviews[0].user_id);
-      })
-
-      .catch(error => {
-        console.error(error);
-      });
   }
   _loadReviews() {
     let url = config.settings.serverPath + '/api/reviews/' + this.state.id;
@@ -96,36 +71,21 @@ export default class ReviewScreen extends Component {
       })
 
       .then(reviews => {
+        for (let i = 0; i < reviews.length; i++) {
+          console.log('Getstate: ' + this.state.user_id);
+          console.log('Get review user_id: ' + reviews[i].user_user_id);
+
+          if (reviews[i].user_user_id == this.state.user_id) {
+            console.log('Get: ' + reviews[i].user_user_id);
+            this.setState({isCommented: true});
+            this.setState({review: reviews[i]});
+            this.setState({user_review_id: reviews[i].reviews_id});
+            console.log('Commented? ' + this.state.isCommented);
+            console.log('user_review_id: ' + this.state.user_review_id);
+          }
+        }
         console.log(reviews);
         this.setState({reviews: reviews});
-        // this.setState({user_id: parseInt(reviews[0].user_id)});
-        // console.log(reviews[0].user_id);
-      })
-
-      .catch(error => {
-        console.error(error);
-      });
-  }
-  _loadReviewsByuser_id() {
-    this._readUser();
-    let url =
-      config.settings.serverPath + '/api/userreview/' + this.state.user_id;
-    this.setState({isFetchingReview_byuser: true});
-    fetch(url)
-      .then(response => {
-        if (!response.ok) {
-          Alert.alert('Error: ', response.status.toString());
-          throw Error('Error ' + response.status);
-        }
-        this.setState({isFetchingReview_byuser: false});
-        return response.json();
-      })
-
-      .then(review => {
-        console.log('re:: ' + review);
-        this.setState({review: review});
-        // this.setState({user_id: parseInt(reviews[0].user_id)});
-        // console.log(reviews[0].user_id);
       })
 
       .catch(error => {
@@ -159,19 +119,15 @@ export default class ReviewScreen extends Component {
       let username = await AsyncStorage.getItem('Username');
       let email = await AsyncStorage.getItem('Email');
       let user_id = await AsyncStorage.getItem('user_id');
-      console.log(user_id);
 
       if (user_id !== null) {
         this.setState({user_id: parseInt(user_id)});
-        // this.setState({username: username});
-        // this.setState({email: email});
-        console.log(this.state.user_id);
-        // console.log(this.state.username);
       }
     } catch (error) {
       console.log('Error loading user details.', error);
     }
   }
+
   render() {
     return (
       <View style={styles.container}>
@@ -298,19 +254,32 @@ export default class ReviewScreen extends Component {
           onPressItem={name => {
             switch (name) {
               case 'add':
-                this.props.navigation.navigate('Create', {
-                  _refresh: this._loadReviews,
-                  place_id: this.state.id,
-                  place_name: this.state.place.name,
-                });
+                console.log(this.state.isCommented);
+
+                if (this.state.isCommented == true) {
+                  Alert.alert(
+                    'You already commented. You can edit your reviews.',
+                  );
+                } else {
+                  this.props.navigation.navigate('Create', {
+                    _refresh: this._loadReviews,
+                    place_id: this.state.id,
+                    place_name: this.state.place.name,
+                  });
+                }
                 break;
               case 'edit':
-                this.props.navigation.navigate('Edit', {
-                  // _refresh: this._loadReviews,
-                  place_id: this.state.id,
-                  place_name: this.state.place.name,
-                  user_id: this.state.user_id,
-                });
+                if (this.state.isCommented == false) {
+                  Alert.alert("You haven't commented!");
+                } else {
+                  this.props.navigation.navigate('Edit', {
+                    _refresh: this._loadReviews,
+                    place_id: this.state.id,
+                    place_name: this.state.place.name,
+                    user_id: this.state.user_id,
+                    user_review_id: this.state.user_review_id,
+                  });
+                }
                 break;
             }
           }}></FloatingAction>
@@ -333,7 +302,7 @@ const styles = StyleSheet.create({
   buttonContainer: {
     justifyContent: 'center',
     flexDirection: 'row',
-    marginTop: -10,
+    marginTop: 5,
     // backgroundColor: 'green',
     // marginLeft: 0,
     // justifyContent: 'space-between',
