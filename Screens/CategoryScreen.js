@@ -61,17 +61,21 @@ export default class CategoryScreen extends Component {
                 }}>
                 <View
                   style={{
-                    borderBottomWidth: 1,
-                    borderBottomColor: 'grey',
+                    height: 130,
+                    borderBottomWidth: 2,
+                    borderBottomColor: 'white',
                     flexDirection: 'row',
+                    backgroundColor: 'lightblue',
+                    borderRadius: 10,
                   }}>
                   <Image
                     source={{uri: item.image}}
                     style={{
                       width: 120,
-                      height: 120,
-                      marginVertical: 10,
-                      borderRadius: 10,
+                      height: 125,
+                      marginVertical: 2,
+                      borderBottomLeftRadius: 10,
+                      borderTopLeftRadius: 10,
                     }}></Image>
                   <View style={{padding: 10}}>
                     <Text
@@ -82,20 +86,14 @@ export default class CategoryScreen extends Component {
                       {item.operatinghours}
                     </Text>
 
-                    <Text style={{width: 200, fontSize: 15}}>
+                    {/* <Text style={{width: 200, fontSize: 15}}>
                       {item.priceRange}
-                    </Text>
+                    </Text> */}
                   </View>
                 </View>
               </TouchableNativeFeedback>
             );
           }}></FlatList>
-        {/* <FloatingAction
-          actions={action}
-          color="#cd5c5c"
-          onPressItem={() =>
-            this.props.navigation.navigate('Create', {_refresh: this._load})
-          }></FloatingAction> */}
       </View>
     );
   }
@@ -105,6 +103,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'flex-start',
-    backgroundColor: 'lightblue',
+    backgroundColor: 'white',
   },
 });

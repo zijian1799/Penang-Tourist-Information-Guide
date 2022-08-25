@@ -6,9 +6,9 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createStackNavigator} from '@react-navigation/stack';
 
 import Icon from 'react-native-vector-icons/FontAwesome';
-import FavScreen from './Screens/FavScreen';
-import ProfileScreen from './Screens/ProfileScreen';
-import SearchScreen from './Screens/SearchScreen';
+import FavScreen from './FavScreen';
+import ProfileScreen from './ProfileScreen';
+import SearchScreen from './SearchScreen';
 
 import HomeNavigator from './HomeNavigator';
 
@@ -35,11 +35,6 @@ export default class ContentScreen extends Component {
           options={styles.navOptions}
         /> */}
         <Tab.Screen
-          name="Profile"
-          component={ProfileScreen}
-          options={styles.profileOptions}
-        />
-        <Tab.Screen
           name="Favourite"
           component={FavScreen}
           options={styles.favOptions}
@@ -48,6 +43,11 @@ export default class ContentScreen extends Component {
           name="Search"
           component={SearchScreen}
           options={styles.searchOptions}
+        />
+        <Tab.Screen
+          name="Profile"
+          component={ProfileScreen}
+          options={styles.profileOptions}
         />
       </Tab.Navigator>
     );

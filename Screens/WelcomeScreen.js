@@ -11,8 +11,10 @@ export default class WelcomeScreen extends Component {
     return (
       <ImageBackground
         style={styles.container}
-        source={require('./Assets/welcomeWallpaper.png')}>
-        <Text style={styles.title}>Welcome to Penang</Text>
+        source={require('../Assets/welcomeWallpaper.png')}>
+        <View>
+          <Text style={styles.title}>Welcome to Penang</Text>
+        </View>
         <Button
           style={styles.button}
           title="Get Started"
@@ -38,7 +40,8 @@ const styles = StyleSheet.create({
     margin: 20,
     alignItems: 'center',
     justifyContent: 'center',
-    fontFamily: 'monospace',
+    textAlign: 'center',
+    fontWeight: 'bold',
   },
   text: {
     color: '#FFFFFF',
