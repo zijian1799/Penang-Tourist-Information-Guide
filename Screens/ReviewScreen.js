@@ -48,7 +48,6 @@ export default class ReviewScreen extends Component {
     };
     this._loadPlaces = this._loadPlaces.bind(this);
     this._loadReviews = this._loadReviews.bind(this);
-
     this._readUser = this._readUser.bind(this);
   }
 
@@ -238,9 +237,15 @@ export default class ReviewScreen extends Component {
                           </Text>
                         </View>
                       </View>
-                      <Text style={{paddingLeft: 10}}>
-                        Stars Rating: {item.ratingStars}
-                      </Text>
+                      <View style={{flexDirection: 'row'}}>
+                        <Text style={{paddingLeft: 10, paddingRight: 3}}>
+                          Stars Rating: {item.ratingStars}
+                        </Text>
+                        <Image
+                          source={require('../Assets/stars.png')}
+                          style={{width: 15, height: 15}}
+                        />
+                      </View>
                       <Text style={styles.reviewText}>"{item.comment} "</Text>
                     </View>
                   </View>
