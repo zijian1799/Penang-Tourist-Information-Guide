@@ -42,8 +42,7 @@ export default class HomeScreen extends Component {
         this.setState({isFetching: false});
         return response.json();
       })
-      .then(places => {
-        // console.log(places);
+      .then(places => {        
         this.setState({places: places});
       })
       .catch(error => {
@@ -64,8 +63,7 @@ export default class HomeScreen extends Component {
         return response.json();
       })
 
-      .then(places => {
-        console.log(places);
+      .then(places => {        
         this.setState({populars: places});
       })
       .catch(error => {

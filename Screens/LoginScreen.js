@@ -48,11 +48,7 @@ export default class LoginScreen extends Component {
       await AsyncStorage.setItem('Username', username);
       await AsyncStorage.setItem('Email', email);
       await AsyncStorage.setItem('user_id', user_id.toString());
-      let test = await AsyncStorage.getItem('user_id');
-      // let test = await AsyncStorage.getItem('user_id');
-
-      // console.log(user_id);
-      console.log(test);
+      
     } catch (error) {
       console.log(error);
     }
