@@ -53,7 +53,7 @@ def favourite_get_row_as_dict(row):
     
 app = Flask(__name__)
 
-@app.route('/api/places', methods=['GET'])
+@app.route('/api/places/', methods=['GET'])
 def index():
     db = sqlite3.connect(DB)
     cursor = db.cursor()
@@ -247,3 +247,37 @@ if __name__ == '__main__':
     port = args.port
 
     app.run(host='0.0.0.0', port=port, debug=True)
+
+# search
+@app.route('/api/search/<string:keyword>', methods=['POST'])
+def index():
+    db = sqlite3.connect(DB)
+    cursor = db.cursor()
+    cursor.execute('SELECT * FROM places ORDER BY name where name like "%?%"', (str(keyword),))
+    rows = cursor.fetchall()
+
+    print(rows)
+
+    db.close()
+
+    rows_as_dict = []
+    for row in rows:
+        row_as_dict = places_get_row_as_dict(row)
+        rows_as_dict.append(row_as_dict)
+
+    return jsonify(rows_as_dict), 200
+
+# favourite
+@app.route('/api/places/<int:id>', methods=['GET'])
+def show(id):
+    db = sqlite3.connect(DB)
+    cursor = db.cursor()
+    cursor.execute('SELECT * FROM places WHERE place_id=?', (int(id),))
+    row = cursor.fetchone()
+    db.close()
+
+    if row:
+        row_as_dict = places_get_row_as_dict(row)
+        return jsonify(row_as_dict), 200
+    else:
+        return jsonify(None), 200
