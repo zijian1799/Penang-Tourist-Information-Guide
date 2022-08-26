@@ -7,6 +7,7 @@ import {
   Dimensions,
   TouchableOpacity,
   Alert,
+  RefreshControlBase,
 } from 'react-native';
 import {FlatList, TouchableWithoutFeedback} from 'react-native-gesture-handler';
 import {FloatingAction} from 'react-native-floating-action';
@@ -75,8 +76,7 @@ export default class ReviewScreen extends Component {
 
       .then(reviews => {
         for (let i = 0; i < reviews.length; i++) {
-          // console.log('Getstate: ' + this.state.user_id);
-          // console.log('Get review user_id: ' + reviews[i].user_user_id);
+          console.log("Compare should run after async")
           this.setState({isCommented: false});
           if (reviews[i].user_user_id == this.state.user_id) {
             console.log('Get: ' + reviews[i].user_user_id);
@@ -116,12 +116,12 @@ export default class ReviewScreen extends Component {
   }
   async _readUser() {
     try {
-      let username = await AsyncStorage.getItem('Username');
-      let email = await AsyncStorage.getItem('Email');
-      let user_id = await AsyncStorage.getItem('user_id');
+      console.log("Async is running.")      
+      let user_id = await AsyncStorage.getItem('user_id');    
 
       if (user_id !== null) {
         this.setState({user_id: parseInt(user_id)});
+        console.log("Data retrieved.",this.state.user_id)        
       }
     } catch (error) {
       console.log('Error loading user details.', error);
