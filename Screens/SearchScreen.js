@@ -7,6 +7,7 @@ import {
   TextInput,
   Button,
   Alert,
+  TouchableNativeFeedback,
 } from 'react-native';
 
 
@@ -17,8 +18,11 @@ export default class SearchScreen extends Component {
     super(props);
     this.state = {
       keyword : '',
+      search : [],
     };
   }
+
+
   _search() {
     let url = config.settings.serverPath + '/api/search/' + this.state.keyword ;
     this.setState({isFetching: true});
@@ -33,8 +37,7 @@ export default class SearchScreen extends Component {
       })
 
       .then(places => {
-        console.log(places);
-        this.setState({populars: places});
+        this.setState({search: places});
       })
       .catch(error => {
         console.error(error);
@@ -58,20 +61,38 @@ export default class SearchScreen extends Component {
                 this.setState({keyword});
               }}
             />
-           {/*  <Image style={styles.avatar} source={{uri: 'https://www.pngkey.com/png/detail/202-2024792_user-profile-icon-png-download-fa-user-circle.png'}}/> */}
           </View>
-          <Button title={'Search'} onPress={this._search.bind(this)}></Button>
+          <View style={styles.buttonSearch}>
+            <Button title={'Search'} onPress={this._search.bind(this)}></Button>
+          </View>
         </View>
-        {/* when click search icon or click enter, execute search query */}
-        <ScrollView style={styles.content}>
-          {/* foreach here */}
-          {/* search response template */}
+        <ScrollView>
+          {this.searchList()}
           {/* when user click on name, bring user to corresponding page/screen */}
         </ScrollView>
       </View>
     );
   }
+
+  searchList(){
+    return this.state.search.map((data) => {
+      return (
+        <TouchableNativeFeedback
+          onPress={() => {
+            this.props.navigation.navigate('detailsScreen', {
+              id: data.place_id,
+            });
+          }}>
+          <View style={styles.searchResultContainer}>
+            <Text style={styles.searchResult}>{data.name}</Text>
+          </View>
+        </TouchableNativeFeedback>
+      )
+    })
+  }
 }
+
+
 
 const styles = StyleSheet.create({
   container: {
@@ -98,4 +119,19 @@ const styles = StyleSheet.create({
   inputText: {
     height: 50,
   },
+  buttonSearch: {
+    marginTop: 20,
+  },
+  searchResultContainer: {
+    width: '100%',
+    height: 50,
+    padding: 10,
+    backgroundColor: 'white',
+    marginTop: 5,
+    marginBottom: 5,
+  },
+  searchResult: {
+    fontSize: 20,
+    textAlign: 'left',
+  }
 });

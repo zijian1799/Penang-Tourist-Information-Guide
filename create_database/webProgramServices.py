@@ -36,8 +36,23 @@ def reviews_get_row_as_dict(row):
     row_dict = {
         'reviews_id': row[0],
         'place_id': row[1],
+        'user_id': row[2],
+        'date': row[3],
+        'ratingStars': row[4],
+        'comment': row[5],
+    }
+
+    return row_dict
+
+def reviews_users_get_row_as_dict(row):
+    row_dict = {
+        'reviews_id':row[0],
+        'review_user_id': row[1],
         'date': row[2],
-        'comment': row[3],
+        'ratingStars': row[3],
+        'comment': row[4],
+        'user_user_id': row[5],
+        'name':row[6],
     }
 
     return row_dict
@@ -53,7 +68,7 @@ def favourite_get_row_as_dict(row):
     
 app = Flask(__name__)
 
-@app.route('/api/places/', methods=['GET'])
+@app.route('/api/places', methods=['GET'])
 def index():
     db = sqlite3.connect(DB)
     cursor = db.cursor()
@@ -147,12 +162,118 @@ def show(id):
     else:
         return jsonify(None), 200
 
-@app.route('/api/ratings_and_reviews/<int:id>', methods=['GET'])
-def get_reviews(id):
+@app.route('/api/reviews/<int:place_id>', methods=['GET'])
+def show_review(place_id):
     db = sqlite3.connect(DB)
     cursor = db.cursor()
-    cursor.execute('SELECT * FROM ratings_and_reviews WHERE place_id=?', (int(id),))
-    row = cursor.fetchall()
+    cursor.execute('SELECT ratings_and_reviews.reviews_id,ratings_and_reviews.user_id,ratings_and_reviews.date,ratings_and_reviews.ratingStars,ratings_and_reviews.comment,users.user_id,users.name FROM ratings_and_reviews JOIN users ON ratings_and_reviews.user_id = users.user_id WHERE ratings_and_reviews.place_id=?', (int(place_id),))
+    rows = cursor.fetchall()
+    print('test')
+    print(rows)
+
+    db.close()
+
+    rows_as_dict = []
+    for row in rows:
+        row_as_dict = reviews_users_get_row_as_dict(row)
+        rows_as_dict.append(row_as_dict)
+
+    return jsonify(rows_as_dict), 200
+
+@app.route('/api/users/<int:user_id>', methods=['GET'])
+def get_review_users(user_id):
+    db = sqlite3.connect(DB)
+    cursor = db.cursor()
+    cursor.execute('SELECT * FROM users WHERE user_id=?', (int(user_id),))
+    row = cursor.fetchone()
+    db.close()
+
+    if row:
+        row_as_dict = user_get_row_as_dict(row)
+        return jsonify(row_as_dict), 200
+    else:
+        return jsonify(None), 200
+
+@app.route('/api/reviews', methods=['POST'])
+def store_review():
+    if not request.json:
+        abort(404)
+
+    new_review = (
+        request.json['place_id'],
+        request.json['user_id'],
+        request.json['date'],
+        request.json['ratingStars'],
+        request.json['comment'],
+    )
+
+    db = sqlite3.connect(DB)
+    cursor = db.cursor()
+
+    cursor.execute('''
+        INSERT INTO ratings_and_reviews(place_id,user_id,date,ratingStars,comment)
+        VALUES(?,?,?,?,?)
+    ''', new_review)
+
+    review_id = cursor.lastrowid
+
+    db.commit()
+
+    response = {
+        'id': review_id,
+        'affected': db.total_changes,
+    }
+
+    db.close()
+
+    return jsonify(response), 201
+
+@app.route('/api/reviews/<int:review>', methods=['PUT'])
+def update_review(review):
+    if not request.json:
+        abort(400)
+
+    if 'reviews_id' not in request.json:
+        abort(400)
+
+    if int(request.json['reviews_id']) != review:
+        abort(400)
+
+    update_review = (
+        request.json['place_id'],
+        request.json['user_id'],
+        request.json['date'],
+        request.json['ratingStars'],
+        request.json['comment'],
+        str(review),
+    )
+
+    db = sqlite3.connect(DB)
+    cursor = db.cursor()
+
+    cursor.execute('''
+        UPDATE ratings_and_reviews SET
+            place_id=?,user_id=?,date=?,ratingStars=?,comment=?
+        WHERE reviews_id=?
+    ''', update_review)
+
+    db.commit()
+
+    response = {
+        'reviews_id': review,
+        'affected': db.total_changes,
+    }
+
+    db.close()
+
+    return jsonify(response), 201
+
+@app.route('/api/user_reviews/<int:reviews_id>', methods=['GET'])
+def show_user_reviews(reviews_id):
+    db = sqlite3.connect(DB)
+    cursor = db.cursor()
+    cursor.execute('SELECT * FROM ratings_and_reviews WHERE reviews_id=?', (int(reviews_id),))
+    row = cursor.fetchone()
     db.close()
 
     if row:
@@ -161,77 +282,26 @@ def get_reviews(id):
     else:
         return jsonify(None), 200
 
-@app.route('/api/ratings_and_reviews/<int:id>', methods=['DELETE'])
-def delete_review(id):
+@app.route('/api/user_reviews/<int:review>', methods=['DELETE'])
+def delete_review(review):
     if not request.json:
+        abort(400)
+
+    if 'reviews_id' not in request.json:
+        abort(400)
+
+    if int(request.json['reviews_id']) != review:
         abort(400)
 
     db = sqlite3.connect(DB)
     cursor = db.cursor()
-    cursor.execute('DELETE FROM ratings_and_reviews WHERE reviews_id = ?', (int(id),))
-    db.commit()
 
-    response = {
-        'review_id': id,
-        'affected': db.total_changes
-    }
-
-    db.close()
-
-    return jsonify(response), 200
-
-@app.route('/api/ratings_and_reviews/', methods=['POST'])
-def create_review():
-    new_comment = (
-        request.json['place_id'],
-        request.json['date'],
-        request.json['comment'],
-    )
-
-    db = sqlite3.connect(DB)
-    cursor = db.cursor()  
-    cursor.execute('''INSERT INTO ratings_and_reviews(place_id,date,comment)VALUES(?,?,?)''',new_comment)
-
-    review_id = cursor.lastrowid 
-
-    db.commit()
-    
-    response = {
-        'id': review_id,
-        'affected': db.total_changes,
-    }
-
-    db.close()
-
-    return jsonify(response),201
-
-@app.route('/api/ratings_and_reviews/<int:id>', methods=['PUT'])
-def update_review(id):
-    if not request.json:
-        abort(400)
-
-    if 'review_id' not in request.json:
-        abort(400)
-
-    if request.json['review_id'] != review_id:
-        abort(400)
-
-    update_review = (
-        request.json['comment'],
-        review_id,
-    )
-
-    db = sqlite3.connect(DB)
-    cursor = db.cursor()
-
-    cursor.execute('''
-        UPDATE ratings_and_reviews SET comment=? WHERE review_id=?
-    ''', update_review)
+    cursor.execute('DELETE FROM ratings_and_reviews WHERE reviews_id=?', (str(review),))
 
     db.commit()
 
     response = {
-        'review_id': review_id,
+        'reviews_id': review,
         'affected': db.total_changes,
     }
 
@@ -239,21 +309,18 @@ def update_review(id):
 
     return jsonify(response), 201
 
-    
-if __name__ == '__main__':
-    parser = ArgumentParser()
-    parser.add_argument('-p', '--port', default=5000, type=int, help='port to listen on')
-    args = parser.parse_args()
-    port = args.port
-
-    app.run(host='0.0.0.0', port=port, debug=True)
-
 # search
-@app.route('/api/search/<string:keyword>', methods=['POST'])
-def index():
+
+@app.route('/api/search/<string:keyword>', methods=['GET'])
+def index_search(keyword):
+    # if keyword == '':
+    #     print("Please input a search query")
+
+    connection = sqlite3.connect(':memory:')
+    connection.set_trace_callback(print)
     db = sqlite3.connect(DB)
     cursor = db.cursor()
-    cursor.execute('SELECT * FROM places ORDER BY name where name like "%?%"', (str(keyword),))
+    cursor.execute("SELECT * FROM places WHERE name like '%' || ? || '%' ORDER BY name", (str(keyword),))
     rows = cursor.fetchall()
 
     print(rows)
@@ -268,8 +335,9 @@ def index():
     return jsonify(rows_as_dict), 200
 
 # favourite
-@app.route('/api/places/<int:id>', methods=['GET'])
-def show(id):
+
+@app.route('/api/favourite/<int:id>', methods=['GET'])
+def show_fav(id):
     db = sqlite3.connect(DB)
     cursor = db.cursor()
     cursor.execute('SELECT * FROM places WHERE place_id=?', (int(id),))
@@ -280,4 +348,14 @@ def show(id):
         row_as_dict = places_get_row_as_dict(row)
         return jsonify(row_as_dict), 200
     else:
-        return jsonify(None), 200
+        return jsonify(None), 200 
+
+
+        
+if __name__ == '__main__':
+    parser = ArgumentParser()
+    parser.add_argument('-p', '--port', default=5000, type=int, help='port to listen on')
+    args = parser.parse_args()
+    port = args.port
+
+    app.run(host='0.0.0.0', port=port, debug=True)
