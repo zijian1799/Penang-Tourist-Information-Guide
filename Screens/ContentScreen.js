@@ -6,7 +6,7 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createStackNavigator} from '@react-navigation/stack';
 
 import Icon from 'react-native-vector-icons/FontAwesome';
-import FavScreen from './FavScreen';
+// import FavScreen from './FavScreen';
 import ProfileScreen from './ProfileScreen';
 import SearchScreen from './SearchScreen';
 
@@ -34,11 +34,11 @@ export default class ContentScreen extends Component {
           component={NavScreen}
           options={styles.navOptions}
         /> */}
-        <Tab.Screen
+        {/* <Tab.Screen
           name="Favourite"
           component={FavScreen}
           options={styles.favOptions}
-        />
+        /> */}
         <Tab.Screen
           name="Search"
           component={SearchScreen}

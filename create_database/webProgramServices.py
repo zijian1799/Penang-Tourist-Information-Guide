@@ -57,14 +57,14 @@ def reviews_users_get_row_as_dict(row):
 
     return row_dict
 
-def favourite_get_row_as_dict(row):
-    row_dict = {
-        'favourite_id': row[0],
-        'place_id': row[1],
-        'user_id': row[2],
-    }
+# def favourite_get_row_as_dict(row):
+#     row_dict = {
+#         'favourite_id': row[0],
+#         'place_id': row[1],
+#         'user_id': row[2],
+#     }
 
-    return row_dict
+#     return row_dict
     
 app = Flask(__name__)
 
@@ -336,19 +336,19 @@ def index_search(keyword):
 
 # favourite
 
-@app.route('/api/favourite/<int:id>', methods=['GET'])
-def show_fav(id):
-    db = sqlite3.connect(DB)
-    cursor = db.cursor()
-    cursor.execute('SELECT * FROM places WHERE place_id=?', (int(id),))
-    row = cursor.fetchone()
-    db.close()
+# @app.route('/api/favourite/<int:id>', methods=['GET'])
+# def show_fav(id):
+#     db = sqlite3.connect(DB)
+#     cursor = db.cursor()
+#     cursor.execute('SELECT * FROM places WHERE place_id=?', (int(id),))
+#     row = cursor.fetchone()
+#     db.close()
 
-    if row:
-        row_as_dict = places_get_row_as_dict(row)
-        return jsonify(row_as_dict), 200
-    else:
-        return jsonify(None), 200 
+#     if row:
+#         row_as_dict = places_get_row_as_dict(row)
+#         return jsonify(row_as_dict), 200
+#     else:
+#         return jsonify(None), 200 
 
 
         

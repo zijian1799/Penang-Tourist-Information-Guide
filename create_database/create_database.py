@@ -39,14 +39,14 @@ db.execute('''CREATE TABLE ratings_and_reviews(
 
 )''')
 
-db.execute('DROP TABLE IF EXISTS favourite_places')
-db.execute('''CREATE TABLE favourite_places(
-    favourite_id integer PRIMARY KEY AUTOINCREMENT,
-    place_id integer NOT NULL,
-    user_id integer NOT NULL,
-    FOREIGN KEY(place_id) REFERENCES places(place_id),
-    FOREIGN KEY(user_id) REFERENCES users(user_id)
-)''')
+# db.execute('DROP TABLE IF EXISTS favourite_places')
+# db.execute('''CREATE TABLE favourite_places(
+#     favourite_id integer PRIMARY KEY AUTOINCREMENT,
+#     place_id integer NOT NULL,
+#     user_id integer NOT NULL,
+#     FOREIGN KEY(place_id) REFERENCES places(place_id),
+#     FOREIGN KEY(user_id) REFERENCES users(user_id)
+# )''')
 
 cursor = db.cursor()
 
