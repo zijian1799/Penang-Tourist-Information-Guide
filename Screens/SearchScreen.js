@@ -10,21 +10,19 @@ import {
   TouchableNativeFeedback,
 } from 'react-native';
 
-
 let config = require('../Config');
 
 export default class SearchScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      keyword : '',
-      search : [],
+      keyword: '',
+      search: [],
     };
   }
 
-
   _search() {
-    let url = config.settings.serverPath + '/api/search/' + this.state.keyword ;
+    let url = config.settings.serverPath + '/api/search/' + this.state.keyword;
     this.setState({isFetching: true});
     fetch(url)
       .then(response => {
@@ -44,9 +42,7 @@ export default class SearchScreen extends Component {
       });
   }
 
-  _poc(){
-    
-  }
+  _poc() {}
 
   render() {
     return (
@@ -74,12 +70,12 @@ export default class SearchScreen extends Component {
     );
   }
 
-  searchList(){
-    return this.state.search.map((data) => {
+  searchList() {
+    return this.state.search.map(data => {
       return (
         <TouchableNativeFeedback
           onPress={() => {
-            this.props.navigation.navigate('detailsScreen', {
+            this.props.navigation.navigate('detailsNavigator', {
               id: data.place_id,
             });
           }}>
@@ -87,12 +83,10 @@ export default class SearchScreen extends Component {
             <Text style={styles.searchResult}>{data.name}</Text>
           </View>
         </TouchableNativeFeedback>
-      )
-    })
+      );
+    });
   }
 }
-
-
 
 const styles = StyleSheet.create({
   container: {
@@ -133,5 +127,5 @@ const styles = StyleSheet.create({
   searchResult: {
     fontSize: 20,
     textAlign: 'left',
-  }
+  },
 });
